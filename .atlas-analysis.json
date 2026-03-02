@@ -1,0 +1,100 @@
+{
+  "projectType": "general",
+  "projectName": "J4yTr1n1ty Dotfiles",
+  "projectDescription": "Personal configuration files for a modern Linux development environment with Hyprland, Zsh, Tmux, and essential development tools.",
+  "theme": "aspen",
+  "primaryColor": "#7aa2f7",
+  "lightColor": "#bb9af7",
+  "darkColor": "#1a1b26",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "prerequisites",
+          "installation"
+        ]
+      },
+      {
+        "group": "Shell Configuration",
+        "pages": [
+          "shell/zsh",
+          "shell/bash",
+          "shell/oh-my-posh",
+          "shell/aliases"
+        ]
+      },
+      {
+        "group": "Terminal & Multiplexer",
+        "pages": [
+          "terminal/ghostty",
+          "terminal/kitty",
+          "terminal/alacritty",
+          "terminal/tmux"
+        ]
+      },
+      {
+        "group": "Desktop Environment",
+        "pages": [
+          "desktop/hyprland",
+          "desktop/waybar",
+          "desktop/wofi",
+          "desktop/mako",
+          "desktop/wallpapers"
+        ]
+      },
+      {
+        "group": "Development Tools",
+        "pages": [
+          "dev/neovim",
+          "dev/lazygit",
+          "dev/ranger",
+          "dev/languages"
+        ]
+      },
+      {
+        "group": "Advanced",
+        "pages": [
+          "advanced/kanata",
+          "advanced/stow",
+          "advanced/scripts",
+          "advanced/systemd"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/keybindings",
+          "reference/troubleshooting",
+          "reference/customization"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Hyprland tiling window manager with smooth animations",
+    "Zsh with Zinit plugin manager and Oh My Posh themes",
+    "Tmux with Tokyo Night theme and vi-mode bindings",
+    "Multiple terminal emulators (Ghostty, Kitty, Alacritty)",
+    "Neovim with LazyVim configuration",
+    "Kanata keyboard remapping (Caps Lock to Esc/Ctrl)",
+    "Modular installation script with component selection",
+    "GNU Stow-based dotfiles management"
+  ],
+  "publicApiSurface": [
+    "install.sh - Main installation script",
+    ".zshrc - Zsh configuration with Zinit",
+    ".bashrc - Bash configuration",
+    ".config/hypr/hyprland.conf - Hyprland window manager config",
+    ".config/tmux/tmux.conf - Tmux configuration",
+    ".config/ghostty/config - Ghostty terminal config",
+    ".config/kitty/kitty.conf - Kitty terminal config",
+    ".config/alacritty/alacritty.toml - Alacritty terminal config",
+    ".config/kanata/config.kbd - Kanata keyboard remapping",
+    ".config/waybar/ - Waybar status bar configuration",
+    ".config/wofi/config - Wofi launcher configuration",
+    ".config/oh-my-posh/themes/zen.toml - Oh My Posh theme",
+    "scripts/tmux/tmux-ch.sh - Tmux session chooser script"
+  ]
+}
