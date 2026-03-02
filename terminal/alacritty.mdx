@@ -1,0 +1,192 @@
+---
+title: Alacritty
+description: Blazing fast, GPU-accelerated terminal emulator written in Rust
+icon: terminal
+---
+
+## Overview
+
+Alacritty is a blazing fast, GPU-accelerated terminal emulator written in Rust. It focuses on simplicity and performance, with configuration done via a TOML file. This setup uses the Catppuccin Mocha color scheme.
+
+## Configuration
+
+The configuration is located at `.config/alacritty/alacritty.toml` and uses TOML format for clear, structured settings.
+
+## Color scheme
+
+The configuration uses the Catppuccin Mocha theme, a warm and soothing pastel color palette.
+
+### Primary colors
+
+```toml
+[colors.primary]
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+dim_foreground = "#7f849c"
+bright_foreground = "#cdd6f4"
+```
+
+### Cursor colors
+
+```toml
+[colors.cursor]
+text = "#1e1e2e"
+cursor = "#f5e0dc"
+
+[colors.vi_mode_cursor]
+text = "#1e1e2e"
+cursor = "#b4befe"
+```
+
+### Normal colors
+
+```toml
+[colors.normal]
+black = "#45475a"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#bac2de"
+```
+
+<Info>
+  The Catppuccin Mocha theme provides excellent contrast while being easy on the eyes during long coding sessions.
+</Info>
+
+## Font configuration
+
+JetBrains Mono Nerd Font is used for excellent readability and icon support:
+
+```toml
+[font]
+size = 12
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+style = "Bold"
+
+[font.bold_italic]
+style = "Bold Italic"
+
+[font.italic]
+style = "Italic"
+```
+
+<CardGroup cols={2}>
+  <Card title="Font family" icon="font">
+    JetBrains Mono Nerd Font with full icon support
+  </Card>
+  <Card title="Size" icon="text-size">
+    12pt for optimal readability
+  </Card>
+  <Card title="Variants" icon="bold">
+    Full support for bold, italic, and bold-italic
+  </Card>
+  <Card title="Ligatures" icon="link">
+    Programming ligatures for better code readability
+  </Card>
+</CardGroup>
+
+## Window configuration
+
+The window is configured for macOS with a clean, minimal appearance:
+
+```toml
+[window]
+decorations = "buttonless"
+dynamic_padding = false
+opacity = 0.95
+option_as_alt = "Both"
+startup_mode = "Windowed"
+
+[window.padding]
+x = 12
+y = 12
+```
+
+<AccordionGroup>
+  <Accordion title="Window decorations">
+    Set to `buttonless` for a clean macOS appearance without traditional window buttons.
+  </Accordion>
+  
+  <Accordion title="Opacity">
+    Background opacity is set to 0.95 for subtle transparency:
+    
+    ```toml
+    opacity = 0.95
+    ```
+  </Accordion>
+  
+  <Accordion title="Padding">
+    12 pixels of padding on both x and y axes provides comfortable spacing:
+    
+    ```toml
+    [window.padding]
+    x = 12
+    y = 12
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Search highlighting
+
+Custom colors for search matches:
+
+```toml
+[colors.search.matches]
+foreground = "#1e1e2e"
+background = "#a6adc8"
+
+[colors.search.focused_match]
+foreground = "#1e1e2e"
+background = "#a6e3a1"
+```
+
+## Selection colors
+
+```toml
+[colors.selection]
+text = "#1e1e2e"
+background = "#f5e0dc"
+```
+
+## Environment variables
+
+The terminal type is explicitly set:
+
+```toml
+[env]
+TERM = "xterm-256color"
+```
+
+<Tip>
+  This ensures proper color support in all terminal applications.
+</Tip>
+
+## macOS integration
+
+Option key behavior is configured for better macOS integration:
+
+```toml
+option_as_alt = "Both"
+```
+
+This allows both left and right Option keys to function as Alt keys for keyboard shortcuts.
+
+## Installation
+
+Install Alacritty and JetBrains Mono Nerd Font, then symlink the configuration:
+
+```bash
+stow -t ~ alacritty
+```
+
+<Note>
+  Alacritty automatically reloads configuration changes, so you can edit the TOML file and see changes immediately.
+</Note>

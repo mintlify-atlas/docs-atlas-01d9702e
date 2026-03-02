@@ -1,0 +1,268 @@
+---
+title: Custom scripts
+description: Utility scripts for tmux, login, and Waybar
+icon: file-code
+---
+
+This dotfiles repository includes several custom scripts for automating common tasks, enhancing tmux workflows, and integrating with Waybar.
+
+## Directory structure
+
+Scripts are organized by purpose:
+
+```
+scripts/
+├── login/
+│   ├── first_login.sh
+│   └── login.sh
+└── tmux/
+    └── tmux-ch.sh
+
+.config/waybar/scripts/
+├── spotify.sh
+├── power-menu/
+│   └── powermenu.sh
+└── ...
+```
+
+## Tmux scripts
+
+### tmux-ch.sh - Cheat sheet chooser
+
+This script provides quick access to programming cheat sheets using [cht.sh](https://cht.sh) within tmux.
+
+```bash scripts/tmux/tmux-ch.sh
+#!/usr/bin/env bash
+selected=`cat ~/.tmux/.tmux-cht-languages ~/.tmux/.tmux-cht-command | fzf`
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+read -p "Enter Query: " query
+
+if grep -qs "$selected" ~/.tmux-cht-languages; then
+    query=`echo $query | tr ' ' '+'`
+    tmux neww bash -c "echo \"curl cht.sh/$selected/$query/\" & curl cht.sh/$selected/$query & while [ : ]; do sleep 1; done"
+else
+    tmux neww bash -c "curl -s cht.sh/$selected~$query | less -R"
+fi
+```
+
+#### How it works
+
+<Steps>
+  <Step title="Select a language or command">
+    Uses `fzf` to fuzzy-find from lists of programming languages and commands stored in `~/.tmux/.tmux-cht-languages` and `~/.tmux/.tmux-cht-command`.
+  </Step>
+  
+  <Step title="Enter your query">
+    Prompts for a search query (e.g., "loop", "parse json", "regex").
+  </Step>
+  
+  <Step title="Display results">
+    Opens a new tmux window with the cheat sheet from cht.sh displayed in `less`.
+  </Step>
+</Steps>
+
+#### Usage
+
+Bind this script to a tmux keybinding in your `.tmux.conf`:
+
+```bash
+bind-key -r C-h run-shell "~/scripts/tmux/tmux-ch.sh"
+```
+
+Then press `prefix + C-h` to launch the cheat sheet chooser.
+
+<Tip>
+Create your language and command lists:
+```bash
+mkdir -p ~/.tmux
+echo "python\nbash\njavascript\nrust" > ~/.tmux/.tmux-cht-languages
+echo "find\nawk\nsed\ngrep" > ~/.tmux/.tmux-cht-command
+```
+</Tip>
+
+## Login scripts
+
+These scripts automate system updates on first login of the day.
+
+### first_login.sh - System update
+
+Runs system updates using the appropriate package manager:
+
+```bash scripts/login/first_login.sh
+# detect package manager
+if [ -x "$(command -v apt)" ]; then
+  sudo apt update
+  sudo apt upgrade
+elif [ -x "$(command -v pacman)" ]; then
+  sudo pacman -Syu
+fi
+```
+
+### login.sh - First login check
+
+Triggers the first login script once per day:
+
+```bash scripts/login/login.sh
+# Check if it's first login of the day
+if [ ! -f "/home/jay/.first_login" ]; then
+  touch "/home/jay/.first_login"
+  ~/scripts/login/first_login.sh
+fi
+```
+
+<Info>
+The `.first_login` marker file should be removed daily by a cron job or systemd timer to ensure updates run on the first login each day.
+</Info>
+
+#### Setup
+
+Add to your `.bashrc` or `.zshrc`:
+
+```bash
+# Run login script
+~/scripts/login/login.sh
+```
+
+<Warning>
+Update the hardcoded path `/home/jay/.first_login` to match your username, or use `$HOME/.first_login` for portability.
+</Warning>
+
+## Waybar scripts
+
+Waybar scripts integrate with the Waybar status bar for displaying media information and system controls.
+
+### spotify.sh - Media player status
+
+Displays currently playing track from Spotify or other media players using `playerctl`:
+
+```bash .config/waybar/scripts/spotify.sh
+#!/usr/bin/env bash
+
+while true; do
+
+	player_status=$(playerctl status 2>/dev/null)
+
+	if [ -z "$(playerctl metadata album)" ]; then
+		if [ "$player_status" = "Playing" ]; then
+			echo "$(playerctl metadata artist) - $(playerctl metadata title)"
+		elif [ "$player_status" = "Paused" ]; then
+			echo " $(playerctl metadata artist) - $(playerctl metadata title)"
+    else
+			echo ""
+		fi
+	else
+		if [ "$player_status" = "Playing" ]; then
+			echo "<span color='#1db954'></span> $(playerctl metadata artist) - $(playerctl metadata title)"
+		elif [ "$player_status" = "Paused" ]; then
+			echo "<span color='#1db954'></span>  $(playerctl metadata artist) - $(playerctl metadata title)"
+    else
+			echo ""
+		fi
+	fi
+
+	sleep 1
+
+done
+```
+
+#### Features
+
+- Shows artist and track title
+- Displays play/pause icons
+- Uses Spotify green (`#1db954`) for album tracks
+- Updates every second
+- Handles no active player gracefully
+
+<Note>
+Requires `playerctl` to be installed: `sudo pacman -S playerctl` or `sudo apt install playerctl`
+</Note>
+
+### powermenu.sh - Power management
+
+Provides a rofi-based power menu for system control:
+
+```bash .config/waybar/scripts/power-menu/powermenu.sh
+#!/usr/bin/env bash
+
+# Options
+shutdown=' Shutdown'
+reboot=' Reboot'
+lock=' Lock'
+suspend=' Suspend'
+logout=' Logout'
+
+# Rofi CMD
+rofi_cmd() {
+	rofi -dmenu \
+		-p "$host" \
+		-mesg "Uptime: $uptime" \
+		-theme ${dir}/${theme}.rasi
+}
+
+# Execute Command
+run_cmd() {
+	selected="$(confirm_exit)"
+	if [[ "$selected" == "$yes" ]]; then
+		if [[ $1 == '--shutdown' ]]; then
+			systemctl poweroff
+		elif [[ $1 == '--reboot' ]]; then
+			systemctl reboot
+		elif [[ $1 == '--suspend' ]]; then
+			mpc -q pause
+			amixer set Master mute
+			systemctl suspend
+		elif [[ $1 == '--logout' ]]; then
+      hyprctl dispatch exit 1
+		fi
+	fi
+}
+```
+
+#### Features
+
+- Shutdown, reboot, suspend, logout, and lock options
+- Confirmation dialog before executing
+- Shows hostname and uptime
+- Integrates with Hyprland, i3lock, or swaylock
+- Mutes audio before suspend
+
+<Tip>
+Configure Waybar to show the power menu on click:
+```json
+"custom/power": {
+  "format": "",
+  "on-click": "~/.config/waybar/scripts/power-menu/powermenu.sh"
+}
+```
+</Tip>
+
+## Making scripts executable
+
+All scripts should have execute permissions:
+
+```bash
+chmod +x ~/scripts/tmux/tmux-ch.sh
+chmod +x ~/scripts/login/*.sh
+chmod +x ~/.config/waybar/scripts/*.sh
+```
+
+<Info>
+If you install dotfiles with the `install.sh` script, permissions are set automatically.
+</Info>
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tmux configuration" icon="terminal" href="/terminal/tmux">
+    Learn about tmux setup and keybindings
+  </Card>
+  <Card title="Waybar configuration" icon="bars" href="/desktop/waybar">
+    Customize your Waybar status bar
+  </Card>
+  <Card title="Installation" icon="download" href="/installation">
+    Install dotfiles and set up scripts
+  </Card>
+</CardGroup>

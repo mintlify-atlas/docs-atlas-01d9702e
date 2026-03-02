@@ -1,0 +1,224 @@
+---
+title: Zsh configuration
+description: Advanced Zsh shell configuration with Zinit plugin manager, FZF, and zoxide integration
+---
+
+## Overview
+
+The Zsh configuration provides a modern, feature-rich shell experience with intelligent completions, syntax highlighting, and seamless integration with powerful tools like FZF and zoxide.
+
+## Zinit plugin manager
+
+Zinit is used as the plugin manager, automatically downloading and managing Zsh plugins.
+
+### Installation
+
+Zinit is automatically installed on first run:
+
+```bash ~/.zshrc
+# Set the directory we want to store zinit and plugins
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+# Download Zinit, if it's not there yet
+if [ ! -d "$ZINIT_HOME" ]; then
+   mkdir -p "$(dirname $ZINIT_HOME)"
+   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+# Source/Load zinit
+source "${ZINIT_HOME}/zinit.zsh"
+```
+
+### Plugins
+
+The configuration loads several essential plugins for enhanced functionality:
+
+<CodeGroup>
+
+```bash Syntax highlighting
+# Real-time syntax highlighting as you type
+zinit light zsh-users/zsh-syntax-highlighting
+```
+
+```bash Completions
+# Additional completion definitions
+zinit light zsh-users/zsh-completions
+```
+
+```bash Autosuggestions
+# Fish-like autosuggestions based on history
+zinit light zsh-users/zsh-autosuggestions
+```
+
+```bash FZF tab
+# Replace tab completion with FZF
+zinit light Aloxaf/fzf-tab
+```
+
+</CodeGroup>
+
+### Oh My Zsh snippets
+
+The configuration also includes useful Oh My Zsh snippets:
+
+```bash ~/.zshrc
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::archlinux
+zinit snippet OMZP::command-not-found
+zinit snippet OMZP::colored-man-pages
+```
+
+## Keybindings
+
+Custom keybindings enhance navigation through command history:
+
+```bash ~/.zshrc
+bindkey -e  # Use emacs keybindings
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+```
+
+<Note>
+  `Ctrl+P` searches backward through history, while `Ctrl+N` searches forward.
+</Note>
+
+## History settings
+
+Robust history configuration ensures commands are saved and deduplicated:
+
+```bash ~/.zshrc
+HISTSIZE=5000
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+HISTDUP=erase
+
+setopt appendhistory
+setopt sharehistory
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
+setopt hist_ignore_dups
+setopt hist_find_no_dups
+```
+
+<Accordion title="History options explained">
+  - `appendhistory` - Append to history file rather than overwriting
+  - `sharehistory` - Share history between all sessions
+  - `hist_ignore_space` - Don't save commands starting with space
+  - `hist_ignore_all_dups` - Delete old duplicate entries
+  - `hist_save_no_dups` - Don't save duplicate entries
+  - `hist_find_no_dups` - Don't show duplicates when searching
+</Accordion>
+
+## Completion styling
+
+Advanced completion settings provide a better user experience:
+
+```bash ~/.zshrc
+# Load completions
+autoload -Uz compinit && compinit
+
+zinit cdreplay -q
+
+# Completion styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+```
+
+## FZF integration
+
+FZF (fuzzy finder) is configured with custom Catppuccin-inspired colors:
+
+```bash ~/.zshrc
+export FZF_DEFAULT_OPTS=" \
+--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+eval "$(fzf --zsh)"
+```
+
+<Note>
+  The FZF color scheme matches the Catppuccin Mocha theme used throughout the dotfiles.
+</Note>
+
+## Zoxide integration
+
+Zoxide provides smarter directory navigation by learning your frequently used directories:
+
+```bash ~/.zshrc
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init --cmd cd zsh)"
+else
+  echo "zoxide not installed"
+fi
+```
+
+With this configuration, `cd` is replaced with zoxide's intelligent jumping:
+
+```bash
+# Jump to a frequently used directory
+cd docs  # Jumps to ~/workspace/docs even from anywhere
+
+# Interactive directory selection
+cdi docs  # Opens FZF selector for matching directories
+```
+
+## Custom functions
+
+### Video conversion
+
+Convert WebM videos to MP4 with even dimensions:
+
+```bash ~/.zshrc
+webm2mp4() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: webm2mp4 <input_file>"
+        return 1
+    fi
+    
+    local input_file="$1"
+    local output_file="${input_file%.*}.mp4"
+    
+    ffmpeg -i "$input_file" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -preset slow -crf 22 -c:a aac -b:a 128k "$output_file"
+}
+```
+
+**Usage:**
+
+```bash
+webm2mp4 recording.webm
+# Creates recording.mp4 with even dimensions
+```
+
+## Tmux auto-start
+
+Automatic tmux session on shell startup:
+
+```bash ~/.zshrc
+if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+  exec tmux
+fi
+```
+
+<Warning>
+  This will automatically start a tmux session when opening a new terminal. Remove this section if you prefer manual tmux management.
+</Warning>
+
+## Start screen
+
+Display system information on shell startup using pfetch:
+
+```bash ~/.zshrc
+export PF_INFO="ascii title os host kernel uptime memory editor palette"
+if command -v pfetch &> /dev/null; then
+  pfetch
+else
+  echo "pfetch not installed"
+fi
+```

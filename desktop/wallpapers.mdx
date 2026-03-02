@@ -1,0 +1,397 @@
+---
+title: Wallpapers
+description: Wallpaper management with hyprpaper and wallpaper collection
+---
+
+This dotfiles setup includes wallpaper management through hyprpaper, a fast wallpaper daemon for Hyprland, along with a curated collection of wallpapers.
+
+## Overview
+
+Hyprpaper is a lightweight wallpaper utility designed specifically for Hyprland that provides:
+
+- Fast wallpaper rendering
+- Multi-monitor support
+- Automatic wallpaper loading on startup
+- Low resource usage
+
+## Hyprpaper setup
+
+### Autostart configuration
+
+Hyprpaper is configured to start automatically with Hyprland:
+
+```conf .config/hypr/hyprland.conf
+exec-once = agsv1 & hyprpaper
+```
+
+<Info>
+  Hyprpaper loads in the background when Hyprland starts, applying your configured wallpaper immediately.
+</Info>
+
+## Configuration
+
+Create a configuration file at `~/.config/hypr/hyprpaper.conf`:
+
+```conf ~/.config/hypr/hyprpaper.conf
+# Preload wallpapers
+preload = ~/dotfiles/Wallpaper/wall-01.png
+preload = ~/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png
+
+# Set wallpaper for monitors
+wallpaper = ,~/dotfiles/Wallpaper/wall-01.png
+
+# Disable splash text
+splash = false
+
+# Disable IPC
+ipc = off
+```
+
+## Configuration options
+
+<AccordionGroup>
+  <Accordion title="Preload">
+    Preload wallpapers into memory for instant switching:
+    ```conf
+    preload = /path/to/wallpaper.png
+    ```
+    You can preload multiple wallpapers.
+  </Accordion>
+  
+  <Accordion title="Wallpaper">
+    Set wallpaper for a specific monitor:
+    ```conf
+    wallpaper = MONITOR,/path/to/wallpaper.png
+    ```
+    Use `,` (empty) to apply to all monitors:
+    ```conf
+    wallpaper = ,/path/to/wallpaper.png
+    ```
+  </Accordion>
+  
+  <Accordion title="Splash">
+    Enable or disable splash text:
+    ```conf
+    splash = true   # Show splash
+    splash = false  # Hide splash
+    ```
+  </Accordion>
+  
+  <Accordion title="IPC">
+    Enable IPC for runtime control:
+    ```conf
+    ipc = on   # Enable IPC
+    ipc = off  # Disable IPC
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Multi-monitor configuration
+
+For multiple monitors with different wallpapers:
+
+```conf ~/.config/hypr/hyprpaper.conf
+# Preload all wallpapers
+preload = ~/dotfiles/Wallpaper/wall-01.png
+preload = ~/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png
+preload = ~/dotfiles/Wallpaper/samurai_strike.jpg
+
+# Set per-monitor wallpapers
+wallpaper = DP-1,~/dotfiles/Wallpaper/wall-01.png
+wallpaper = DP-2,~/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png
+wallpaper = HDMI-A-1,~/dotfiles/Wallpaper/samurai_strike.jpg
+```
+
+<Tip>
+  Use `hyprctl monitors` to see your monitor names (DP-1, HDMI-A-1, etc.)
+</Tip>
+
+## Wallpaper collection
+
+The dotfiles include a curated collection of wallpapers in the `Wallpaper/` directory:
+
+<CardGroup cols={2}>
+  <Card title="wall-01.png" icon="image">
+    2.27 MB - High quality wallpaper
+  </Card>
+  <Card title="cafe-at-night_00_3840x2160.png" icon="moon">
+    7.25 MB - 4K night scene
+  </Card>
+  <Card title="street-tn.png" icon="road">
+    372 KB - Tokyo Night street scene
+  </Card>
+  <Card title="a_street_with_buildings_and_signs.png" icon="city">
+    2.27 MB - Urban landscape
+  </Card>
+  <Card title="samurai_strike.jpg" icon="user-ninja">
+    1.72 MB - Samurai artwork
+  </Card>
+</CardGroup>
+
+## Wallpaper directory structure
+
+```bash
+~/dotfiles/Wallpaper/
+├── wall-01.png (2.3 MB)
+├── cafe-at-night_00_3840x2160.png (7.6 MB)
+├── street-tn.png (381 KB)
+├── a_street_with_buildings_and_signs.png (2.4 MB)
+└── samurai_strike.jpg (1.8 MB)
+```
+
+## Using wallpapers
+
+### Set a single wallpaper
+
+```conf
+preload = ~/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png
+wallpaper = ,~/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png
+```
+
+### Street scene for lock screen
+
+The street-tn.png is used for the lock screen in Hyprland:
+
+```conf .config/hypr/hyprland.conf
+bindl=SUPER,L,exec, swaylock -f -e -l -L -s fill -i ~/dotfiles/Wallpaper/street-tn.png
+```
+
+## Wallpaper formats supported
+
+Hyprpaper supports common image formats:
+
+- PNG (recommended for best quality)
+- JPG/JPEG (good for smaller file sizes)
+- WebP
+- BMP
+
+## Adding custom wallpapers
+
+<Steps>
+  <Step title="Add wallpaper to directory">
+    Copy your wallpaper to the Wallpaper directory:
+    ```bash
+    cp /path/to/your-wallpaper.png ~/dotfiles/Wallpaper/
+    ```
+  </Step>
+  
+  <Step title="Preload the wallpaper">
+    Add to hyprpaper.conf:
+    ```conf
+    preload = ~/dotfiles/Wallpaper/your-wallpaper.png
+    ```
+  </Step>
+  
+  <Step title="Set as active wallpaper">
+    Configure wallpaper assignment:
+    ```conf
+    wallpaper = ,~/dotfiles/Wallpaper/your-wallpaper.png
+    ```
+  </Step>
+  
+  <Step title="Reload hyprpaper">
+    Restart hyprpaper to apply changes:
+    ```bash
+    killall hyprpaper && hyprpaper &
+    ```
+  </Step>
+</Steps>
+
+## Runtime wallpaper switching
+
+### With IPC enabled
+
+Enable IPC in hyprpaper.conf:
+
+```conf
+ipc = on
+```
+
+Then use hyprctl to change wallpapers:
+
+```bash
+# Preload a new wallpaper
+hyprctl hyprpaper preload "~/dotfiles/Wallpaper/samurai_strike.jpg"
+
+# Set wallpaper
+hyprctl hyprpaper wallpaper ",~/dotfiles/Wallpaper/samurai_strike.jpg"
+
+# Unload unused wallpaper
+hyprctl hyprpaper unload "~/dotfiles/Wallpaper/old-wallpaper.png"
+```
+
+### Wallpaper switcher script
+
+Create a script to cycle through wallpapers:
+
+```bash ~/dotfiles/scripts/wallpaper-switcher.sh
+#!/bin/bash
+
+WALLPAPERS=(
+    "$HOME/dotfiles/Wallpaper/wall-01.png"
+    "$HOME/dotfiles/Wallpaper/cafe-at-night_00_3840x2160.png"
+    "$HOME/dotfiles/Wallpaper/samurai_strike.jpg"
+)
+
+CURRENT=$(cat ~/.current-wallpaper 2>/dev/null || echo 0)
+NEXT=$(( (CURRENT + 1) % ${#WALLPAPERS[@]} ))
+
+hyprctl hyprpaper preload "${WALLPAPERS[$NEXT]}"
+hyprctl hyprpaper wallpaper ",${WALLPAPERS[$NEXT]}"
+
+echo $NEXT > ~/.current-wallpaper
+notify-send "Wallpaper Changed" "Now using wallpaper $((NEXT + 1))/${#WALLPAPERS[@]}"
+```
+
+Make it executable and bind to a key:
+
+```bash
+chmod +x ~/dotfiles/scripts/wallpaper-switcher.sh
+```
+
+```conf .config/hypr/hyprland.conf
+bind = $mainMod, W, exec, ~/dotfiles/scripts/wallpaper-switcher.sh
+```
+
+## Optimizing wallpapers
+
+### For 4K displays
+
+Use high-resolution images (3840x2160 or higher):
+```
+cafe-at-night_00_3840x2160.png - Perfect for 4K
+```
+
+### For 1080p displays
+
+Resize large images to save memory:
+
+```bash
+# Using ImageMagick
+convert input.png -resize 1920x1080 output.png
+
+# Using ffmpeg
+ffmpeg -i input.png -vf scale=1920:1080 output.png
+```
+
+### Reduce file size
+
+Optimize PNG files:
+
+```bash
+# Using optipng
+optipng -o7 wallpaper.png
+
+# Using pngquant
+pngquant --quality=80-95 wallpaper.png
+```
+
+## Wallpaper recommendations
+
+<CardGroup cols={2}>
+  <Card title="Anime/Art" icon="palette">
+    - High contrast artwork
+    - Tokyo Night themed
+    - Samurai/Japanese aesthetic
+  </Card>
+  
+  <Card title="Nature" icon="tree">
+    - Night scenes
+    - City landscapes
+    - Minimalist designs
+  </Card>
+  
+  <Card title="Abstract" icon="shapes">
+    - Geometric patterns
+    - Gradient backgrounds
+    - Dark themes
+  </Card>
+  
+  <Card title="Photography" icon="camera">
+    - Urban photography
+    - Street scenes
+    - Architectural shots
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Wallpaper not loading">
+    Check that hyprpaper is running:
+    ```bash
+    pgrep -a hyprpaper
+    ```
+    
+    If not running, start it:
+    ```bash
+    hyprpaper &
+    ```
+  </Accordion>
+  
+  <Accordion title="Wrong wallpaper appears">
+    Verify the path in hyprpaper.conf:
+    ```bash
+    ls -lh ~/dotfiles/Wallpaper/
+    ```
+    
+    Ensure paths use absolute paths or proper ~ expansion.
+  </Accordion>
+  
+  <Accordion title="Wallpaper is blurry">
+    Use wallpapers that match or exceed your monitor resolution:
+    ```bash
+    # Check monitor resolution
+    hyprctl monitors | grep -A 5 Monitor
+    ```
+  </Accordion>
+  
+  <Accordion title="High memory usage">
+    Reduce the number of preloaded wallpapers:
+    ```conf
+    # Only preload what you need
+    preload = ~/dotfiles/Wallpaper/wall-01.png
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Alternative wallpaper tools
+
+<CardGroup cols={3}>
+  <Card title="hyprpaper" icon="check">
+    Native Hyprland support, fast, lightweight
+  </Card>
+  
+  <Card title="swaybg" icon="desktop">
+    Sway/wlroots wallpaper tool, Wayland compatible
+  </Card>
+  
+  <Card title="wpaperd" icon="images">
+    Wallpaper daemon with scheduling
+  </Card>
+</CardGroup>
+
+## Wallpaper sources
+
+Find high-quality wallpapers:
+
+- [Unsplash](https://unsplash.com/) - Free high-resolution photos
+- [r/wallpapers](https://reddit.com/r/wallpapers) - Curated wallpaper community
+- [wallhaven.cc](https://wallhaven.cc/) - Large wallpaper database
+- [r/unixporn](https://reddit.com/r/unixporn) - Linux desktop screenshots and wallpapers
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Hyprland" icon="desktop" href="/desktop/hyprland">
+    Hyprpaper autostart configuration
+  </Card>
+  <Card title="Lock screen" icon="lock" href="/desktop/hyprland#keybindings">
+    Swaylock wallpaper setup
+  </Card>
+</CardGroup>
+
+## Resources
+
+- [Hyprpaper GitHub](https://github.com/hyprwm/hyprpaper)
+- [Hyprland Wiki - Wallpapers](https://wiki.hyprland.org/Useful-Utilities/Wallpapers/)

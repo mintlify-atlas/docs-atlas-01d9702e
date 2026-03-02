@@ -1,0 +1,246 @@
+---
+title: GNU Stow for dotfiles management
+description: Manage dotfiles symlinks with GNU Stow
+icon: link
+---
+
+GNU Stow is a symlink farm manager that makes it easy to manage dotfiles. Instead of copying configuration files to your home directory, Stow creates symbolic links, allowing you to keep all your dotfiles in a single Git repository.
+
+## How Stow works
+
+Stow operates on the concept of "packages". In this dotfiles repository, the entire directory is treated as a single package, with the repository root representing your home directory structure.
+
+When you run Stow, it:
+1. Traverses the package directory
+2. Creates symbolic links in the parent directory (your home directory)
+3. Mirrors the directory structure
+4. Skips files listed in `.stow-local-ignore`
+
+<Info>
+Stow creates links from your home directory to the files in your dotfiles repository. This means you can edit files in place, and changes are immediately tracked by Git.
+</Info>
+
+## Basic usage
+
+### Installing dotfiles
+
+From your dotfiles repository directory:
+
+```bash
+stow .
+```
+
+This command creates symlinks in your home directory for all files and directories in the current directory.
+
+<Tip>
+The `.` (dot) refers to the current directory. You can also specify the directory explicitly: `stow /path/to/dotfiles`
+</Tip>
+
+### Removing dotfiles
+
+To remove all symlinks created by Stow:
+
+```bash
+stow -D .
+```
+
+The `-D` flag (delete) removes symlinks but preserves the files in your dotfiles repository.
+
+### Restowing dotfiles
+
+If you've added new files or changed the structure:
+
+```bash
+stow -R .
+```
+
+The `-R` flag (restow) first removes existing symlinks, then creates new ones. This is useful after pulling updates.
+
+### Dry run
+
+To see what Stow would do without making changes:
+
+```bash
+stow -n .
+```
+
+or for more verbose output:
+
+```bash
+stow -nv .
+```
+
+## Ignore patterns
+
+The `.stow-local-ignore` file specifies patterns for files and directories that Stow should skip when creating symlinks.
+
+```text .stow-local-ignore
+# Version control
+RCS
+.+,v
+CVS
+\.\.#.+       # CVS conflict files / emacs lock files
+\.cvsignore
+\.svn
+_darcs
+\.hg
+\.git
+\.gitignore
+\.gitattributes
+\.gitmodules
+
+# Editor backup files
+.+~          # emacs backup files
+\#.*\#       # emacs autosave files
+
+# Documentation and licenses
+^/README.*
+^/LICENSE.*
+^/COPYING
+
+# Custom exclusions
+.*\.ttf
+install.sh
+```
+
+<Note>
+The patterns use regular expressions. The `^/` prefix matches files only at the repository root, while patterns without it match anywhere in the tree.
+</Note>
+
+### Common exclusions explained
+
+<AccordionGroup>
+  <Accordion title="Version control files">
+    Files like `.git`, `.gitignore`, and `.gitmodules` are excluded because they're used for repository management and shouldn't be symlinked to your home directory.
+  </Accordion>
+  
+  <Accordion title="README and LICENSE">
+    Documentation files at the repository root (`^/README.*`, `^/LICENSE.*`) are excluded since they're for the repository itself, not part of your system configuration.
+  </Accordion>
+  
+  <Accordion title="install.sh">
+    The installation script is excluded because it's a helper script for setting up the dotfiles, not a configuration file to be linked.
+  </Accordion>
+  
+  <Accordion title="Font files (.ttf)">
+    Font files are excluded because they should be installed to the system font directory rather than symlinked from the dotfiles repository.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+### Existing files conflict
+
+If Stow encounters existing files that aren't symlinks, it will abort with an error:
+
+```
+WARNING! stowing . would cause conflicts:
+  * existing target is not owned by stow: .bashrc
+```
+
+<Steps>
+  <Step title="Backup the existing file">
+    ```bash
+    mv ~/.bashrc ~/.bashrc.backup
+    ```
+  </Step>
+  
+  <Step title="Run Stow again">
+    ```bash
+    stow .
+    ```
+  </Step>
+  
+  <Step title="Merge any custom configurations">
+    Compare the backup with the new symlinked file and merge any custom settings.
+  </Step>
+</Steps>
+
+### Broken symlinks
+
+To find broken symlinks in your home directory:
+
+```bash
+find ~ -maxdepth 3 -type l ! -exec test -e {} \; -print
+```
+
+Remove broken symlinks:
+
+```bash
+find ~ -maxdepth 3 -type l ! -exec test -e {} \; -delete
+```
+
+<Warning>
+Be careful with the `-delete` flag. Always run without `-delete` first to review what will be removed.
+</Warning>
+
+### Verifying symlinks
+
+To check if a file is a symlink and where it points:
+
+```bash
+ls -la ~/.config/kanata/config.kbd
+```
+
+The output will show the symlink arrow:
+```
+lrwxrwxrwx 1 user user 45 Mar 2 10:00 .config/kanata/config.kbd -> /home/user/dotfiles/.config/kanata/config.kbd
+```
+
+## Advanced usage
+
+### Stow with different target directory
+
+By default, Stow uses the parent directory as the target. To specify a different target:
+
+```bash
+stow -t /custom/target/directory .
+```
+
+### Multiple packages
+
+You can organize dotfiles into multiple packages and stow them selectively:
+
+```bash
+# Repository structure:
+# dotfiles/
+#   shell/
+#     .bashrc
+#     .zshrc
+#   editor/
+#     .config/nvim/
+
+# Stow only shell configs
+cd dotfiles
+stow shell
+
+# Stow only editor configs
+stow editor
+```
+
+### Adopting existing files
+
+The `--adopt` flag moves existing files into your dotfiles repository and replaces them with symlinks:
+
+```bash
+stow --adopt .
+```
+
+<Warning>
+This modifies files in your dotfiles repository. Review changes with `git diff` before committing.
+</Warning>
+
+## Integration with the install script
+
+This dotfiles repository includes an `install.sh` script that automates the Stow process along with other setup steps. See the [Installation guide](/installation) for details.
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up the dotfiles with the install script
+  </Card>
+  <Card title="GNU Stow manual" icon="book" href="https://www.gnu.org/software/stow/manual/stow.html">
+    Official GNU Stow documentation
+  </Card>
+</CardGroup>

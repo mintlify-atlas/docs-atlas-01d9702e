@@ -1,0 +1,147 @@
+---
+title: Ranger
+description: Terminal file manager with keyboard-driven navigation
+icon: folder-tree
+---
+
+## Overview
+
+Ranger is a console file manager with VI key bindings. It provides a minimalistic and efficient interface for browsing directories and managing files from the terminal.
+
+## Installation
+
+### Arch Linux
+
+```bash
+yay -S ranger
+```
+
+### Ubuntu/Debian
+
+```bash
+sudo apt install ranger
+```
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="VI keybindings" icon="keyboard">
+    Navigate using h, j, k, l like in Vim
+  </Card>
+  <Card title="File previews" icon="eye">
+    Preview files directly in the terminal
+  </Card>
+  <Card title="Quick navigation" icon="bolt">
+    Fast directory jumping and searching
+  </Card>
+  <Card title="Minimal interface" icon="window-minimize">
+    Clean, distraction-free file management
+  </Card>
+</CardGroup>
+
+## Shell integration
+
+Ranger is configured with a special alias that allows it to change the shell's directory when you exit:
+
+```bash .zshrc
+# Ranger, if installed
+if command -v ranger &> /dev/null; then
+  alias ra="ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"
+fi
+```
+
+### How the integration works
+
+<Steps>
+  <Step title="Launch with alias">
+    Use `ra` instead of `ranger` to enable directory tracking
+  </Step>
+  <Step title="Navigate directories">
+    Browse and navigate to your target directory in Ranger
+  </Step>
+  <Step title="Exit Ranger">
+    Press `q` to quit Ranger
+  </Step>
+  <Step title="Shell follows">
+    Your shell automatically changes to the last directory you were in
+  </Step>
+</Steps>
+
+## Usage
+
+### Basic commands
+
+```bash
+ranger          # Launch normally
+ra              # Launch with directory change integration
+```
+
+### Navigation keybindings
+
+| Key | Action |
+|-----|--------|
+| `h` | Go to parent directory |
+| `j` | Move down |
+| `k` | Move up |
+| `l` | Enter directory or open file |
+| `gg` | Go to top |
+| `G` | Go to bottom |
+| `/` | Search |
+| `q` | Quit |
+
+### File operations
+
+| Key | Action |
+|-----|--------|
+| `yy` | Copy file |
+| `dd` | Cut file |
+| `pp` | Paste file |
+| `dD` | Delete file |
+| `cw` | Rename file |
+| `space` | Select file |
+
+## Configuration
+
+Ranger can be customized through configuration files in `~/.config/ranger/`:
+
+- `rc.conf` - Settings and keybindings
+- `rifle.conf` - File associations
+- `scope.sh` - Preview script customization
+
+<Note>
+  Generate default configuration files with: `ranger --copy-config=all`
+</Note>
+
+## Preview enhancements
+
+For better file previews, install these optional dependencies:
+
+```bash
+# Image previews
+yay -S w3m
+
+# Code highlighting
+yay -S highlight
+
+# PDF previews
+yay -S poppler
+```
+
+## Integration with other tools
+
+Ranger works seamlessly with the development environment:
+
+- Launches from Tmux sessions
+- Can open files in Neovim
+- Respects shell environment variables
+- Integrates with FZF for fuzzy finding
+
+<Tip>
+  Use `1` to toggle Miller columns view, `2` for dual-pane, and `3` for preview pane visibility.
+</Tip>
+
+## Related tools
+
+- [Neovim](/dev/neovim) - Default editor for opening files
+- FZF - Fuzzy finder for quick file access
+- Zoxide - Smart directory jumping

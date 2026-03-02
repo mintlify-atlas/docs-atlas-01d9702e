@@ -1,0 +1,234 @@
+---
+title: Bash configuration
+description: Standard Bash shell configuration with custom prompt and zoxide integration
+---
+
+## Overview
+
+The Bash configuration provides a solid foundation for users who prefer the traditional Bash shell, enhanced with modern tools like zoxide for intelligent directory navigation.
+
+## Interactive shell check
+
+The configuration only runs for interactive shells:
+
+```bash ~/.bashrc
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+```
+
+## History configuration
+
+Bash history is configured to avoid duplicates and provide reasonable limits:
+
+```bash ~/.bashrc
+# Don't put duplicate lines or lines starting with space in the history
+HISTCONTROL=ignoreboth
+
+# Append to the history file, don't overwrite it
+shopt -s histappend
+
+# Set history length
+HISTSIZE=1000
+HISTFILESIZE=2000
+```
+
+<Accordion title="History settings explained">
+  - `ignoreboth` - Ignore duplicates and lines starting with space
+  - `histappend` - Append to history file instead of overwriting
+  - `HISTSIZE` - Number of commands to remember in memory (1000)
+  - `HISTFILESIZE` - Maximum lines in history file (2000)
+</Accordion>
+
+## Shell options
+
+Useful shell options for better terminal behavior:
+
+```bash ~/.bashrc
+# Check window size after each command
+shopt -s checkwinsize
+```
+
+This ensures the `LINES` and `COLUMNS` variables are updated after each command.
+
+## Prompt configuration
+
+The Bash prompt is configured with color support for better visibility:
+
+<Tabs>
+  <Tab title="Colored prompt">
+    ```bash ~/.bashrc
+    # Colored prompt showing user@host:directory
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    ```
+    
+    Displays as: `user@host:~/directory$` with green username and blue directory.
+  </Tab>
+  <Tab title="Plain prompt">
+    ```bash ~/.bashrc
+    # Plain prompt without colors
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    ```
+    
+    Displays as: `user@host:~/directory$` without colors.
+  </Tab>
+</Tabs>
+
+### Terminal title
+
+For xterm-compatible terminals, the window title is automatically set:
+
+```bash ~/.bashrc
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+esac
+```
+
+## Color support
+
+Automatic color support for common commands:
+
+```bash ~/.bashrc
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+```
+
+## Default aliases
+
+Standard Bash aliases for common operations:
+
+```bash ~/.bashrc
+alias ll='ls -alF'   # Long list with file types
+alias la='ls -A'     # List all except . and ..
+alias l='ls -CF'     # Compact list with file types
+```
+
+### Alert alias
+
+Useful for long-running commands:
+
+```bash ~/.bashrc
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+```
+
+**Usage:**
+
+```bash
+# Get a notification when a long command completes
+sudo apt update && sudo apt upgrade; alert
+```
+
+## Zoxide integration
+
+The Bash configuration includes custom zoxide integration for intelligent directory navigation:
+
+```bash ~/.bashrc
+_z_cd() {
+    builtin cd "$@" || return "$?"
+
+    if [ "$_ZO_ECHO" = "1" ]; then
+        echo "$PWD"
+    fi
+}
+
+cd() {
+    if [ "$#" -eq 0 ]; then
+        _z_cd ~
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        if [ -n "$OLDPWD" ]; then
+            _z_cd "$OLDPWD"
+        else
+            echo 'zoxide: $OLDPWD is not set'
+            return 1
+        fi
+    else
+        _zoxide_result="$(zoxide query -- "$@")" && _z_cd "$_zoxide_result"
+    fi
+}
+```
+
+### Zoxide commands
+
+<CardGroup cols={2}>
+  <Card title="cdi" icon="magnifying-glass">
+    Interactive directory selection using FZF
+    ```bash
+    cdi docs  # Opens FZF selector
+    ```
+  </Card>
+  <Card title="cda" icon="plus">
+    Manually add a directory to zoxide
+    ```bash
+    cda /path/to/dir
+    ```
+  </Card>
+  <Card title="cdq" icon="database">
+    Query zoxide database
+    ```bash
+    cdq docs
+    ```
+  </Card>
+  <Card title="cdr" icon="trash">
+    Remove directory from zoxide
+    ```bash
+    cdr /path/to/dir
+    ```
+  </Card>
+</CardGroup>
+
+## Custom configurations
+
+### Neovim as default editor
+
+```bash ~/.bashrc
+alias vim="nvim"
+```
+
+### Homebrew environment
+
+```bash ~/.bashrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+
+### Rust/Cargo environment
+
+```bash ~/.bashrc
+. "$HOME/.cargo/env"
+```
+
+## WSL-specific settings
+
+For Windows Subsystem for Linux users, the configuration includes GWSL (graphical) support:
+
+```bash ~/.bashrc
+export LIBGL_ALWAYS_INDIRECT=1
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
+export PULSE_SERVER=tcp:$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}')
+```
+
+<Note>
+  These settings enable graphical applications and audio in WSL by routing to the Windows host.
+</Note>
+
+## Completion support
+
+Programmable completion features are enabled if available:
+
+```bash ~/.bashrc
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+```

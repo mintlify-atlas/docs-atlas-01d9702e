@@ -1,0 +1,485 @@
+---
+title: Installation
+description: Step-by-step guide to installing and configuring the dotfiles on your system
+---
+
+# Installation
+
+This guide walks you through installing the dotfiles using both the automated installer and manual methods with GNU Stow.
+
+## Quick installation
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the dotfiles repository to your home directory:
+    
+    ```bash
+    git clone https://github.com/J4yTr1n1ty/dotfiles.git ~/dotfiles
+    cd ~/dotfiles
+    ```
+  </Step>
+  
+  <Step title="Run the installer">
+    Execute the installation script with sudo privileges:
+    
+    ```bash
+    sudo ./install.sh
+    ```
+    
+    <Note>
+    The script needs sudo to install system packages, but it will correctly handle user-specific installations by detecting the actual user.
+    </Note>
+  </Step>
+  
+  <Step title="Select components">
+    The installer presents an interactive menu where you can choose which components to install:
+    
+    - **Core Shell Environment** - Zsh, Tmux, Neovim (recommended)
+    - **Terminal Emulators** - Ghostty, Kitty, Alacritty
+    - **Hyprland Desktop** - Complete Wayland desktop environment
+    - **Fonts** - JetBrains Mono NF, Maple Mono NF
+    - **Development Tools** - .NET, Go, Rust, Node.js, Bun
+    - **Additional Utilities** - htop, btop, git-delta, etc.
+  </Step>
+  
+  <Step title="Confirm and install">
+    Review your selections and confirm to begin the installation. The script will:
+    
+    - Install all selected packages
+    - Set up configuration files using Stow
+    - Configure shell defaults
+    - Enable necessary services
+  </Step>
+</Steps>
+
+## Component selection
+
+The modular installer lets you pick exactly what you need. Here's what each component includes:
+
+### Core shell environment
+
+**Packages installed:**
+- zsh, tmux, fzf, neovim, ranger
+- eza, zoxide, lazygit, pfetch
+- bat, fd, ripgrep
+- Oh My Posh prompt engine
+
+**Configurations applied:**
+- `.zshrc` with Zinit plugin manager
+- Tmux config with vi-mode bindings
+- Oh My Posh theme (Zen)
+- LazyVim for Neovim
+
+<Note>
+The core shell environment is recommended for all installations as it provides the foundation for terminal productivity.
+</Note>
+
+### Terminal emulators
+
+Choose one or more terminal emulators:
+
+<CardGroup cols={3}>
+  <Card title="Ghostty" icon="1">
+    Primary terminal with modern features (Arch only for auto-install)
+  </Card>
+  <Card title="Kitty" icon="2">
+    GPU-accelerated with image support
+  </Card>
+  <Card title="Alacritty" icon="3">
+    Minimal and fast OpenGL terminal
+  </Card>
+</CardGroup>
+
+All terminals are configured with:
+- Consistent color schemes
+- JetBrains Mono Nerd Font
+- Optimized performance settings
+
+### Hyprland desktop environment
+
+**Includes:**
+```bash
+# Core compositor
+hyprland hyprpaper
+
+# Desktop components  
+waybar wofi mako swaylock
+
+# System utilities
+brightnessctl pamixer playerctl
+
+# Network and Bluetooth
+blueman networkmanager nm-connection-editor
+```
+
+**Configurations:**
+- Hyprland with smooth animations and keybindings
+- Waybar with custom modules (battery, network, audio, etc.)
+- Wofi application launcher styling
+- Mako notification daemon theme
+- Swaylock screen locker
+
+<Warning>
+Hyprland auto-installation is only available on Arch Linux. On Ubuntu/Debian, you'll need to compile it manually. The installer can still deploy the configuration files.
+</Warning>
+
+### Fonts
+
+Choose which Nerd Fonts to install:
+
+- **JetBrains Mono NF** - Primary font used throughout configs
+- **Maple Mono NF** - Alternative monospace font
+
+Fonts are installed to `~/.local/share/fonts` on manual installations.
+
+### Development tools
+
+**Available options:**
+
+<CodeGroup>
+```bash .NET
+# Arch
+yay -S dotnet-runtime dotnet-sdk aspnet-runtime
+
+# Ubuntu/Debian (via Microsoft repo)
+# Automatically configured by installer
+```
+
+```bash Go
+yay -S go  # Arch
+sudo apt install golang  # Ubuntu/Debian
+```
+
+```bash Rust
+# Via rustup (all platforms)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+```bash Node.js
+# Via NVM (all platforms)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install --lts
+```
+
+```bash Bun
+# JavaScript runtime (all platforms)
+curl -fsSL https://bun.sh/install | bash
+```
+</CodeGroup>
+
+## Manual installation with Stow
+
+If you prefer manual control or want to install on a different distribution:
+
+<Steps>
+  <Step title="Install prerequisites">
+    Ensure you have Stow and Git installed:
+    ```bash
+    # Arch
+    sudo pacman -S stow git
+    
+    # Ubuntu/Debian  
+    sudo apt install stow git
+    ```
+  </Step>
+  
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/J4yTr1n1ty/dotfiles.git ~/dotfiles
+    cd ~/dotfiles
+    ```
+  </Step>
+  
+  <Step title="Initialize submodules">
+    The repository uses submodules for Neovim configuration:
+    ```bash
+    git submodule update --init --recursive
+    ```
+  </Step>
+  
+  <Step title="Install packages manually">
+    Install the packages you need based on the [Prerequisites](/prerequisites) page.
+  </Step>
+  
+  <Step title="Deploy configs with Stow">
+    Stow will create symlinks from the dotfiles to your home directory:
+    ```bash
+    stow .
+    ```
+    
+    This links all configuration files to your home directory while keeping them in the Git repository.
+  </Step>
+</Steps>
+
+### Selective deployment
+
+If you only want specific configurations, you can stow individual directories:
+
+```bash
+# Only Zsh configuration
+stow -d ~/dotfiles -t ~ .zshrc
+
+# Only Tmux configuration  
+stow -d ~/dotfiles -t ~ .config/tmux
+
+# Multiple specific configs
+stow -d ~/dotfiles -t ~ .zshrc .config/tmux .config/nvim
+```
+
+### Restowing configurations
+
+If you need to refresh symlinks:
+
+```bash
+cd ~/dotfiles
+stow --restow .
+```
+
+## Post-installation steps
+
+After installation, complete these steps to activate everything:
+
+<Steps>
+  <Step title="Change default shell to Zsh">
+    ```bash
+    chsh -s $(which zsh)
+    ```
+    
+    Then log out and log back in, or start a new terminal session.
+  </Step>
+  
+  <Step title="Install Tmux plugins">
+    Start tmux and install plugins:
+    ```bash
+    tmux
+    ```
+    
+    Then press `Ctrl+a` followed by `Shift+I` to install all plugins via TPM.
+    
+    <Note>
+    The installer automatically clones TPM (Tmux Plugin Manager) to `~/.tmux/plugins/tpm`.
+    </Note>
+  </Step>
+  
+  <Step title="Activate development tools">
+    If you installed development tools, activate them:
+    
+    ```bash
+    # Rust
+    source ~/.cargo/env
+    
+    # Node.js via NVM
+    source ~/.nvm/nvm.sh
+    nvm use --lts
+    
+    # Bun
+    source ~/.bun/_bun
+    ```
+    
+    These will be automatically sourced in new shell sessions.
+  </Step>
+  
+  <Step title="Start Hyprland (if installed)">
+    Log out and select Hyprland from your display manager.
+    
+    If you don't have a display manager:
+    ```bash
+    Hyprland
+    ```
+  </Step>
+  
+  <Step title="Enable Kanata (optional)">
+    If you want keyboard remapping with Kanata:
+    ```bash
+    systemctl --user daemon-reload
+    systemctl --user enable kanata.service --now
+    systemctl --user status kanata.service
+    ```
+    
+    <Note>
+    Kanata remaps Caps Lock to Escape (tap) / Ctrl (hold). Check the service status to ensure it's running properly.
+    </Note>
+  </Step>
+</Steps>
+
+## Understanding GNU Stow
+
+Stow creates symlinks from the dotfiles repository to your home directory. Here's how it works:
+
+```
+~/dotfiles/               # Source (this repository)
+├── .zshrc               → ~/.zshrc
+├── .bashrc              → ~/.bashrc  
+├── .config/
+│   ├── tmux/
+│   │   └── tmux.conf    → ~/.config/tmux/tmux.conf
+│   ├── nvim/            → ~/.config/nvim/
+│   └── hypr/            → ~/.config/hypr/
+└── ...
+```
+
+**Benefits:**
+- All configs stay in one Git repository
+- Edit files directly in the repo
+- Changes are immediately reflected in your system
+- Easy to back up, version control, and sync across machines
+
+### Stow ignore patterns
+
+The `.stow-local-ignore` file tells Stow which files NOT to symlink:
+
+```bash
+# Not symlinked to home directory:
+.git/
+.gitignore
+README.md
+install.sh
+*.ttf
+scripts/
+```
+
+The automated installer creates a custom ignore file to exclude components you didn't select.
+
+## Verifying installation
+
+Check that everything is working:
+
+<CodeGroup>
+```bash Shell environment
+# Verify Zsh is default
+echo $SHELL  # Should show /usr/bin/zsh or similar
+
+# Check Oh My Posh
+oh-my-posh --version
+
+# Test modern tools
+eza --version
+zoxide --version  
+lazygit --version
+```
+
+```bash Tmux
+# Start tmux
+tmux
+
+# Check TPM is installed
+ls ~/.tmux/plugins/tpm
+
+# Verify plugins (press Ctrl+a + I if needed)
+```
+
+```bash Hyprland
+# Check Hyprland version
+Hyprland --version
+
+# Verify compositor is running (once logged in)
+echo $XDG_SESSION_TYPE  # Should show 'wayland'
+```
+</CodeGroup>
+
+## Troubleshooting
+
+### Stow conflicts
+
+If Stow reports conflicts with existing files:
+
+```bash
+# Back up existing configs
+mv ~/.zshrc ~/.zshrc.backup
+mv ~/.config/tmux ~/.config/tmux.backup
+
+# Then restow
+cd ~/dotfiles
+stow --restow .
+```
+
+### Shell not changing
+
+If `chsh` doesn't work:
+
+```bash
+# Verify Zsh is installed
+which zsh
+
+# Check current shell
+echo $SHELL
+
+# Try with full path
+chsh -s /usr/bin/zsh
+
+# Then completely log out and back in
+```
+
+### Missing dependencies
+
+If tools are missing:
+
+```bash
+# Verify installation
+which eza zoxide lazygit
+
+# Check PATH includes ~/.local/bin
+echo $PATH | grep \.local/bin
+
+# Restart shell to reload PATH
+exec zsh
+```
+
+### Hyprland won't start
+
+Check logs for issues:
+
+```bash
+# System journal
+journalctl --user -u hyprland
+
+# Hyprland log
+cat ~/.local/share/hyprland/hyprland.log
+```
+
+### Fonts not showing icons
+
+```bash
+# Verify font is installed
+fc-list | grep -i jetbrains
+
+# Refresh font cache
+fc-cache -fv
+
+# Restart terminal emulator
+```
+
+<Warning>
+If you continue to have issues, check that you've completed all steps in the [Prerequisites](/prerequisites) section.
+</Warning>
+
+## Updating dotfiles
+
+To update your dotfiles:
+
+```bash
+cd ~/dotfiles
+git pull origin main
+git submodule update --recursive --remote
+stow --restow .
+```
+
+## Uninstalling
+
+To remove the symlinks:
+
+```bash
+cd ~/dotfiles
+stow -D .
+```
+
+This removes all symlinks but keeps the repository and your configuration files intact.
+
+## Next steps
+
+Now that you have the dotfiles installed:
+
+- Explore the [Shell Configuration](/shell/zsh) to customize your shell
+- Learn about [Terminal Emulators](/terminal/tmux) and multiplexer setup
+- Check out [Keybindings](/reference/keybindings) for keyboard shortcuts
+- Review [Customization](/reference/customization) for personalization options

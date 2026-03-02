@@ -1,0 +1,351 @@
+---
+title: Systemd user services
+description: Manage user services with systemd
+icon: gear
+---
+
+Systemd user services allow you to run and manage background processes without requiring root privileges. This dotfiles repository includes systemd service definitions for running services like Kanata keyboard remapping.
+
+## User services location
+
+User service files are stored in:
+
+```
+.config/systemd/user/
+└── kanata.service
+```
+
+After symlinking with Stow, these services are available at `~/.config/systemd/user/`.
+
+## Service file structure
+
+Systemd service files use an INI-like format with sections and key-value pairs.
+
+### Example: kanata.service
+
+```ini .config/systemd/user/kanata.service
+[Unit]
+Description=Kanata keyboard remapper
+Documentation=https://github.com/jtroo/kanata
+
+[Service]
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin
+Type=simple
+ExecStart=/usr/bin/sh -c 'exec $$(which kanata) --cfg $${HOME}/.config/kanata/config.kbd'
+Restart=no
+
+[Install]
+WantedBy=default.target
+```
+
+### Section breakdown
+
+<AccordionGroup>
+  <Accordion title="[Unit] section">
+    Contains metadata and dependencies:
+    
+    - **Description**: Human-readable description of the service
+    - **Documentation**: URL to documentation or man pages
+    - **After**: Start this service after specified units
+    - **Requires**: Dependencies that must be running
+  </Accordion>
+  
+  <Accordion title="[Service] section">
+    Defines how the service runs:
+    
+    - **Type**: Service type (`simple`, `forking`, `oneshot`, etc.)
+    - **ExecStart**: Command to start the service
+    - **ExecStop**: Command to stop the service (optional)
+    - **Restart**: Restart policy (`no`, `always`, `on-failure`)
+    - **Environment**: Environment variables for the service
+  </Accordion>
+  
+  <Accordion title="[Install] section">
+    Controls how the service is enabled:
+    
+    - **WantedBy**: Target that should include this service when enabled
+    - **RequiredBy**: Stronger dependency relationship
+  </Accordion>
+</AccordionGroup>
+
+## Managing user services
+
+### Basic commands
+
+All systemd user commands use the `--user` flag:
+
+```bash
+# Reload systemd configuration
+systemctl --user daemon-reload
+
+# Start a service
+systemctl --user start kanata.service
+
+# Stop a service
+systemctl --user stop kanata.service
+
+# Restart a service
+systemctl --user restart kanata.service
+
+# Check service status
+systemctl --user status kanata.service
+
+# Enable service (start on login)
+systemctl --user enable kanata.service
+
+# Disable service
+systemctl --user disable kanata.service
+
+# View service logs
+journalctl --user -u kanata.service
+
+# Follow service logs
+journalctl --user -u kanata.service -f
+```
+
+<Note>
+User services start when you log in and stop when you log out, unless you enable lingering (see below).
+</Note>
+
+### Enable lingering
+
+To keep user services running after logout:
+
+```bash
+sudo loginctl enable-linger $USER
+```
+
+This allows your user services to:
+- Start at boot
+- Continue running after logout
+- Survive session closures
+
+Check linger status:
+
+```bash
+loginctl show-user $USER | grep Linger
+```
+
+## Service lifecycle
+
+<Steps>
+  <Step title="Create service file">
+    Place your `.service` file in `~/.config/systemd/user/`
+  </Step>
+  
+  <Step title="Reload systemd">
+    ```bash
+    systemctl --user daemon-reload
+    ```
+    Required after creating or modifying service files.
+  </Step>
+  
+  <Step title="Enable the service">
+    ```bash
+    systemctl --user enable kanata.service
+    ```
+    Creates symlinks so the service starts automatically.
+  </Step>
+  
+  <Step title="Start the service">
+    ```bash
+    systemctl --user start kanata.service
+    ```
+    Starts the service immediately without waiting for next login.
+  </Step>
+</Steps>
+
+## Service types
+
+### Simple
+
+The default type. Systemd considers the service started immediately after forking the ExecStart process.
+
+```ini
+[Service]
+Type=simple
+ExecStart=/usr/bin/my-daemon
+```
+
+Use for services that:
+- Run in the foreground
+- Don't fork to background
+- Keep running continuously
+
+### Oneshot
+
+For services that run a single task and exit:
+
+```ini
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/my-setup-script
+RemainAfterExit=yes
+```
+
+Use for:
+- Setup scripts
+- One-time initialization
+- Scripts that should run on login
+
+### Forking
+
+For traditional daemons that fork to background:
+
+```ini
+[Service]
+Type=forking
+ExecStart=/usr/bin/my-traditional-daemon
+PIDFile=/run/user/%U/my-daemon.pid
+```
+
+## Environment variables
+
+You can set environment variables for services:
+
+```ini
+[Service]
+# Single variable
+Environment="LOG_LEVEL=debug"
+
+# Multiple variables
+Environment="VAR1=value1" "VAR2=value2"
+
+# From file
+EnvironmentFile=/home/user/.config/my-service.env
+```
+
+<Tip>
+Use `%h` for home directory and `%U` for user ID:
+```ini
+EnvironmentFile=%h/.config/my-service.env
+```
+</Tip>
+
+## Restart policies
+
+```ini
+[Service]
+# Never restart
+Restart=no
+
+# Always restart
+Restart=always
+
+# Restart only on failure
+Restart=on-failure
+
+# Restart except on clean exit
+Restart=on-abnormal
+
+# Delay between restarts
+RestartSec=5s
+```
+
+## Troubleshooting
+
+### Service fails to start
+
+<Steps>
+  <Step title="Check service status">
+    ```bash
+    systemctl --user status kanata.service
+    ```
+    Look for error messages in the output.
+  </Step>
+  
+  <Step title="View detailed logs">
+    ```bash
+    journalctl --user -u kanata.service -n 50
+    ```
+    Shows the last 50 log lines.
+  </Step>
+  
+  <Step title="Test the ExecStart command">
+    Run the command from ExecStart directly in your shell to see if it works.
+  </Step>
+  
+  <Step title="Verify file paths">
+    Ensure all paths in the service file are absolute and correct.
+  </Step>
+</Steps>
+
+### Service doesn't start on login
+
+- Verify the service is enabled: `systemctl --user is-enabled kanata.service`
+- Check if the service is masked: `systemctl --user list-unit-files | grep kanata`
+- Ensure `WantedBy=default.target` is in the `[Install]` section
+
+### Changes not taking effect
+
+Always reload systemd after editing service files:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user restart kanata.service
+```
+
+## Listing services
+
+```bash
+# List all user services
+systemctl --user list-units --type=service
+
+# List all user services (including inactive)
+systemctl --user list-units --type=service --all
+
+# List enabled services
+systemctl --user list-unit-files --type=service --state=enabled
+
+# List running services
+systemctl --user list-units --type=service --state=running
+```
+
+## Creating custom services
+
+### Template for a custom service
+
+```ini ~/.config/systemd/user/my-service.service
+[Unit]
+Description=My custom service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/bin/my-script.sh
+Restart=on-failure
+RestartSec=10s
+
+# Optional: Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=default.target
+```
+
+After creating:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable my-service.service
+systemctl --user start my-service.service
+```
+
+<Warning>
+Ensure your script has:
+- Execute permissions: `chmod +x ~/bin/my-script.sh`
+- Absolute path in ExecStart
+- Proper shebang line (e.g., `#!/bin/bash`)
+</Warning>
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Kanata keyboard remapping" icon="keyboard" href="/advanced/kanata">
+    Configure Kanata with systemd
+  </Card>
+  <Card title="systemd.service man page" icon="book" href="https://www.freedesktop.org/software/systemd/man/systemd.service.html">
+    Official systemd service documentation
+  </Card>
+</CardGroup>

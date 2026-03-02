@@ -1,0 +1,243 @@
+---
+title: Programming languages
+description: Development language setups including .NET, Go, Rust, Node.js, and Bun
+icon: code
+---
+
+## Overview
+
+The dotfiles include comprehensive PATH configurations and installation scripts for multiple programming languages and runtimes. All language tools are properly integrated into the shell environment.
+
+## .NET development
+
+### Installation
+
+```bash
+# Arch Linux
+yay -S dotnet-runtime dotnet-sdk aspnet-runtime
+```
+
+### PATH configuration
+
+.NET tools are added to PATH:
+
+```bash .zshrc
+export PATH="~/.dotnet/tools:$PATH"
+```
+
+### Usage
+
+```bash
+dotnet --version
+dotnet new console
+dotnet build
+dotnet run
+```
+
+### Custom alias
+
+A special alias for prettier test output:
+
+```bash .zshrc
+alias dotnet-test-pretty='dotnet test --no-restore --verbosity=normal | awk '\''...'\'''
+```
+
+## Go programming
+
+### Installation
+
+```bash
+# Arch Linux
+yay -S go
+```
+
+### Environment setup
+
+```bash .zshrc
+# Go
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+```
+
+### Usage
+
+```bash
+go version
+go mod init myproject
+go build
+go run main.go
+```
+
+<Tip>
+  The GOPATH is set to `$HOME/go`, where all Go packages and binaries will be installed.
+</Tip>
+
+## Rust development
+
+### Installation
+
+Rust is installed via rustup:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+### Environment setup
+
+Cargo environment is automatically loaded:
+
+```bash .zshrc
+# Cargo
+[ -s "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+```
+
+### Usage
+
+```bash
+rustc --version
+cargo --version
+cargo new myproject
+cargo build
+cargo run
+```
+
+### Additional tools
+
+Many CLI tools are installed via Cargo:
+
+```bash
+# Examples from the dotfiles
+cargo install eza zoxide
+```
+
+## Node.js with NVM
+
+### Installation
+
+NVM (Node Version Manager) allows managing multiple Node.js versions:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Then install LTS version
+nvm install --lts
+```
+
+### Environment setup
+
+```bash .zshrc
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+```
+
+### Usage
+
+```bash
+nvm install --lts    # Install latest LTS
+nvm install 18       # Install specific version
+nvm use 18           # Switch to version 18
+nvm list             # List installed versions
+node --version
+npm --version
+```
+
+## Bun JavaScript runtime
+
+### Installation
+
+Bun is a fast all-in-one JavaScript runtime:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+### Environment setup
+
+```bash .zshrc
+# bun completions
+[ -s "/home/jay/.bun/_bun" ] && source "/home/jay/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+```
+
+### Usage
+
+```bash
+bun --version
+bun run index.ts     # Run TypeScript directly
+bun install          # Install dependencies
+bun test             # Run tests
+```
+
+<CardGroup cols={2}>
+  <Card title="Fast execution" icon="rocket">
+    Bun executes JavaScript/TypeScript much faster than Node.js
+  </Card>
+  <Card title="Built-in tools" icon="toolbox">
+    Includes bundler, test runner, and package manager
+  </Card>
+  <Card title="TypeScript support" icon="code">
+    Runs TypeScript files without compilation step
+  </Card>
+  <Card title="NPM compatible" icon="box">
+    Works with existing NPM packages
+  </Card>
+</CardGroup>
+
+## Additional package managers
+
+### pnpm
+
+```bash .zshrc
+export PNPM_HOME="/home/jay/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+```
+
+### Homebrew
+
+For managing additional development tools:
+
+```bash .zshrc
+[ -s "/home/linuxbrew/.linuxbrew/bin/brew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+
+## Development workflow optimization
+
+<Steps>
+  <Step title="Install language runtimes">
+    Set up all required languages using the installation commands above
+  </Step>
+  <Step title="Verify PATH configuration">
+    Ensure shell configuration files are properly linked with Stow
+  </Step>
+  <Step title="Restart shell">
+    Source updated configuration: `source ~/.zshrc`
+  </Step>
+  <Step title="Verify installations">
+    Check versions: `dotnet --version`, `go version`, `cargo --version`, etc.
+  </Step>
+</Steps>
+
+## Tool integration
+
+All language tools integrate with:
+
+- **Neovim/LazyVim**: LSP servers auto-configured for each language
+- **Tmux**: Run development servers in separate panes
+- **Lazygit**: Manage version control across projects
+- **Zsh completions**: Tab completion for CLI commands
+
+<Note>
+  After installing any new language runtime, restart your shell or run `source ~/.zshrc` to load the environment changes.
+</Note>
+
+## Related tools
+
+- [Neovim](/dev/neovim) - Editor with LSP support for all languages
+- [Lazygit](/dev/lazygit) - Git interface for version control

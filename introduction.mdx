@@ -1,0 +1,167 @@
+---
+title: Introduction
+description: A modern Linux development environment with Hyprland, Zsh, Tmux, and essential development tools
+---
+
+# Welcome to J4yTr1n1ty's dotfiles
+
+Personal configuration files for a modern Linux development environment featuring a beautiful Hyprland setup, powerful shell configuration, and streamlined development workflows.
+
+## What you'll get
+
+This dotfiles collection provides a complete, production-ready development environment that's both aesthetically pleasing and highly functional. Everything is managed through GNU Stow for easy installation and maintenance.
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/installation">
+    Get up and running in minutes with the automated installer
+  </Card>
+  <Card title="Prerequisites" icon="list-check" href="/prerequisites">
+    Check what you need before installing
+  </Card>
+  <Card title="Configuration" icon="sliders" href="/shell/zsh">
+    Learn how to customize your setup
+  </Card>
+  <Card title="Desktop environment" icon="puzzle-piece" href="/desktop/hyprland">
+    Explore Hyprland and desktop components
+  </Card>
+</CardGroup>
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Hyprland window manager" icon="window-maximize">
+    Smooth animations, efficient tiling, and modern Wayland compositor for a beautiful desktop experience
+  </Card>
+  
+  <Card title="Powerful shell environment" icon="terminal">
+    Zsh with Zinit plugin manager, Oh My Posh prompt, syntax highlighting, and smart completions
+  </Card>
+  
+  <Card title="Modern terminal emulators" icon="square-terminal">
+    Configurations for Ghostty (primary), Kitty, and Alacritty with consistent theming
+  </Card>
+  
+  <Card title="Tmux with vi-mode" icon="grid-2">
+    Terminal multiplexer with vi-mode bindings, Tokyo Night theme, and session persistence
+  </Card>
+  
+  <Card title="Neovim LazyVim" icon="code">
+    Pre-configured Neovim with LazyVim for a complete IDE experience
+  </Card>
+  
+  <Card title="Developer-friendly tools" icon="wrench">
+    LazyGit, fzf, eza, zoxide, ripgrep, bat, and more for enhanced productivity
+  </Card>
+  
+  <Card title="Keyboard optimization" icon="keyboard">
+    Kanata for advanced key remapping with Caps Lock as Escape/Ctrl (tap/hold)
+  </Card>
+  
+  <Card title="Modular installation" icon="puzzle-piece">
+    Interactive installer lets you choose exactly which components you want
+  </Card>
+</CardGroup>
+
+## What's included
+
+### Desktop environment
+
+- **Window Manager**: Hyprland with smooth animations and efficient tiling
+- **Status Bar**: Waybar with custom modules and styling
+- **App Launcher**: Wofi for clean, keyboard-driven application launching
+- **Notifications**: Mako notification daemon
+- **Wallpaper**: Hyprpaper for background management
+- **Lock Screen**: Swaylock with custom styling
+
+### Shell and terminal
+
+- **Shell**: Zsh with Zinit plugin manager
+  - Syntax highlighting and autosuggestions
+  - Git integration and aliases
+  - Smart completions with fzf-tab
+  - Colored man pages
+- **Prompt**: Oh My Posh with custom Zen theme
+- **Terminal Multiplexer**: Tmux with vi-mode bindings and TPM
+- **Terminals**: Ghostty (primary), Kitty, Alacritty
+
+### Development tools
+
+- **Editor**: Neovim with LazyVim configuration
+- **Version Control**: Git with LazyGit TUI and delta for diffs
+- **File Navigation**: Ranger for keyboard-driven file management
+- **Search & Find**: fzf, ripgrep, fd
+- **File Listing**: eza (modern ls replacement)
+- **Directory Jumping**: zoxide (smart cd)
+- **File Viewing**: bat (cat with syntax highlighting)
+- **System Info**: pfetch for minimal system information
+
+### Keyboard customization
+
+- **Kanata**: Advanced keyboard remapping daemon
+  - Caps Lock remapped to Escape (tap) / Ctrl (hold)
+  - Systemd service for automatic startup
+
+### Fonts
+
+- **JetBrains Mono Nerd Font**: Primary font with icon support
+- **Monocraft**: Alternative monospace font
+- Automatic font cache refresh
+
+## Platform support
+
+The dotfiles are optimized for Linux systems with first-class support for:
+
+<CardGroup cols={2}>
+  <Card title="Arch Linux" icon="linux">
+    Full automated installation with packages from official repositories and AUR
+  </Card>
+  <Card title="Ubuntu/Debian" icon="ubuntu">
+    Supported with manual installation steps for some components
+  </Card>
+</CardGroup>
+
+<Note>
+Most packages are now available in official Arch repositories, making installation much more reliable than previous AUR-heavy setups.
+</Note>
+
+## Development workflows
+
+This configuration is battle-tested and optimized for:
+
+- **.NET Development**: Full SDK and runtime support
+- **Angular & TypeScript**: Node.js via NVM, modern tooling
+- **Go Programming**: Complete Go development environment  
+- **Rust Development**: Rustup with cargo integration
+- **General Web Development**: Bun, modern JavaScript runtimes
+
+## Design philosophy
+
+<Steps>
+  <Step title="Modular and flexible">
+    Choose only the components you need with the interactive installer
+  </Step>
+  
+  <Step title="Version controlled">
+    All configurations tracked in Git with submodules for complex setups
+  </Step>
+  
+  <Step title="Easy to maintain">
+    GNU Stow manages symlinks automatically - update once, apply everywhere
+  </Step>
+  
+  <Step title="Keyboard-first">
+    Optimized for keyboard-driven workflows with vim-style bindings throughout
+  </Step>
+  
+  <Step title="Beautiful and functional">
+    Tokyo Night theme with smooth animations that don't sacrifice performance
+  </Step>
+</Steps>
+
+## Ready to get started?
+
+Head over to the [Prerequisites](/prerequisites) page to check system requirements, or jump straight to [Installation](/installation) if you're ready to go.
+
+<Warning>
+Always review configuration files before installing dotfiles on your system. While these configs are thoroughly tested, your system may have unique requirements.
+</Warning>

@@ -1,0 +1,187 @@
+---
+title: Kitty
+description: Feature-rich, GPU-accelerated terminal emulator with extensive customization
+icon: cat
+---
+
+## Overview
+
+Kitty is a fast, feature-rich, GPU-accelerated terminal emulator with extensive customization options. This configuration uses JetBrains Mono Nerd Font and includes two TokyoNight-inspired themes.
+
+## Main configuration
+
+The primary configuration is in `.config/kitty/kitty.conf`:
+
+```bash
+# vim:ft=kitty
+font_family  jetbrains mono nerd font 
+bold_font auto  
+italic_font auto
+bold_italic_font auto
+url_style dotted
+font_size  12 
+window_padding_width 5 
+enable_audio_bell no
+window_border_width 0
+```
+
+## Font settings
+
+<AccordionGroup>
+  <Accordion title="Font family">
+    JetBrains Mono Nerd Font provides excellent readability and includes powerline glyphs and icons:
+    
+    ```bash
+    font_family  jetbrains mono nerd font
+    font_size  12
+    ```
+  </Accordion>
+  
+  <Accordion title="Font variants">
+    Bold, italic, and bold-italic variants are automatically selected:
+    
+    ```bash
+    bold_font auto  
+    italic_font auto
+    bold_italic_font auto
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Tab bar configuration
+
+Kitty features a customized powerline-style tab bar:
+
+```bash
+tab_bar_min_tabs 2
+tab_bar_style powerline 
+tab_powerline_style slanted
+tab_title_template          {title}{' :{}:'.format(num_windows) if num_windows > 1 else ''}
+```
+
+<Info>
+  The tab bar shows the number of windows in each tab when there's more than one window.
+</Info>
+
+## Window settings
+
+```bash
+window_padding_width 5 
+enable_audio_bell no
+window_border_width 0
+```
+
+<CardGroup cols={2}>
+  <Card title="Padding" icon="arrows-left-right">
+    5 pixels of padding around terminal content
+  </Card>
+  <Card title="Audio bell" icon="bell-slash">
+    Audio bell is disabled for distraction-free work
+  </Card>
+  <Card title="Borders" icon="border-none">
+    No window borders for a clean look
+  </Card>
+  <Card title="Opacity" icon="droplet">
+    Dynamic background opacity support enabled
+  </Card>
+</CardGroup>
+
+## Background opacity
+
+Dynamic opacity adjustment is enabled:
+
+```bash
+#background_opacity         0.90
+dynamic_background_opacity yes
+```
+
+<Tip>
+  Uncomment `background_opacity` and set a value between 0 and 1 to enable transparency.
+</Tip>
+
+## Custom keybindings
+
+New windows and tabs open in the current working directory:
+
+```bash
+map kitty_mod+enter launch --cwd=current --type=window
+map cmd+enter       launch --cwd=current --type=window
+map kitty_mod+t     launch --cwd=current --type=tab
+map cmd+t           launch --cwd=current --type=tab
+map kitty_mod+q     none
+```
+
+## Theme configuration
+
+The configuration includes two TokyoNight-inspired themes.
+
+### TokyoDark theme
+
+Currently active theme (`.config/kitty/tokyodark.conf`):
+
+```bash
+color0 #06080a
+color1 #ee6d85
+color2 #95c561
+color3 #d7a65f
+color4 #7199ee
+color5 #a485dd
+color6 #38a89d
+color7 #a0a8cd
+background #11121d
+foreground #a0a8cd
+cursor #a0a8cd
+```
+
+### TokyoNight theme
+
+Alternative theme available (`.config/kitty/tokyonight.conf`):
+
+```bash
+foreground #a9b1d6
+background #1a1b26
+
+# Black
+color0 #414868
+color8 #414868
+
+# Red
+color1 #f7768e
+color9 #f7768e
+
+# Green
+color2  #73daca
+color10 #73daca
+
+# Blue
+color4  #7aa2f7
+color12 #7aa2f7
+```
+
+<Info>
+  The TokyoNight theme includes additional configurations for cursor, selection, URL colors, and tab bar styling.
+</Info>
+
+### Switching themes
+
+To switch between themes, edit `kitty.conf` and change the include line:
+
+```bash
+# Current:
+include tokyodark.conf
+
+# Alternative:
+include tokyonight.conf
+```
+
+## Installation
+
+Install Kitty and JetBrains Mono Nerd Font, then symlink the configuration:
+
+```bash
+stow -t ~ kitty
+```
+
+<Note>
+  After changing the configuration, reload Kitty with `Ctrl+Shift+F5` or restart the terminal.
+</Note>

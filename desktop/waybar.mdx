@@ -1,0 +1,446 @@
+---
+title: Waybar
+description: Waybar status bar configuration and customization
+---
+
+Waybar is a highly customizable Wayland bar for Sway and Hyprland, featuring support for custom modules, scripts, and styling.
+
+## Overview
+
+This dotfiles repository includes multiple Waybar configurations:
+
+- **Waybar 3.0**: Modern configuration with custom modules located in `.config/waybar/Waybar-3.0/`
+- **Tokyo style**: Minimalist Tokyo Night themed configuration in `.config/waybar/`
+
+## Configuration structure
+
+Waybar configurations consist of two main files:
+
+- `config.json` or `config`: Defines modules and their behavior
+- `style.css`: Defines the visual appearance
+
+## Waybar 3.0 configuration
+
+### Module layout
+
+```json .config/waybar/Waybar-3.0/config.json
+{
+  "layer": "top",
+  "height": 35,
+  "margin-top": 10,
+  "margin-left": 10,
+  "margin-bottom": 0,
+  "margin-right": 10,
+  "spacing": 0,
+  
+  "modules-left": [
+    "custom/launcher",
+    "custom/separator",
+    "cpu",
+    "memory",
+    "temperature",
+    "custom/separator",
+    "custom/window-name",
+    "custom/pacman-update-icon",
+    "custom/pacman-update",
+    "tray"
+  ],
+  
+  "modules-center": ["wlr/workspaces"],
+  
+  "modules-right": [
+    "battery",
+    "backlight",
+    "pulseaudio",
+    "custom/right-arr",
+    "network",
+    "custom/clock-icon",
+    "clock"
+  ]
+}
+```
+
+<Info>
+  The configuration uses custom modules that reference external scripts for enhanced functionality.
+</Info>
+
+### Workspace module
+
+```json .config/waybar/Waybar-3.0/config.json
+"wlr/workspaces": {
+  "all-outputs": true,
+  "active-only": false,
+  "on-click": "activate",
+  "format": "{icon}",
+  "on-scroll-up": "hyprctl dispatch workspace e+1",
+  "on-scroll-down": "hyprctl dispatch workspace e-1",
+  "format-icons": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": "",
+    "5": "",
+    "6": "",
+    "urgent": "",
+    "active": "",
+    "default": ""
+  }
+}
+```
+
+### System monitoring modules
+
+<AccordionGroup>
+  <Accordion title="CPU module">
+    ```json
+    "cpu": {
+      "interval": 10,
+      "format": " {usage}%",
+      "max-length": 10,
+      "tooltip": false
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Memory module">
+    ```json
+    "memory": {
+      "interval": 30,
+      "format": " {used}GiB",
+      "format-alt": " {used:0.1f}G",
+      "max-length": 10
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Temperature module">
+    ```json
+    "temperature": {
+      "thermal-zone": 0,
+      "critical-threshold": 80,
+      "format-critical": " {temperatureC}°C",
+      "format": " {temperatureC}°C"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Hardware modules
+
+```json .config/waybar/Waybar-3.0/config.json
+"battery": {
+  "bat": "BAT1",
+  "interval": 30,
+  "states": {
+    "warning": 30,
+    "critical": 15
+  },
+  "format": "{icon} {capacity}%",
+  "format-charging": " {icon} {capacity}%",
+  "format-icons": [" ", " ", " ", " "],
+  "max-length": 25,
+  "tooltip": false
+}
+
+"backlight": {
+  "device": "amdgpu_bl1",
+  "format": "{icon} {percent}",
+  "tooltip": false,
+  "format-icons": ["", "", ""]
+}
+```
+
+### Audio module
+
+```json .config/waybar/Waybar-3.0/config.json
+"pulseaudio": {
+  "format": "{icon} <b>{volume}</b>",
+  "format-bluetooth": " ",
+  "format-bluetooth-muted": " ",
+  "tooltip": false,
+  "format-muted": "",
+  "format-icons": {
+    "default": ["", "", ""]
+  },
+  "on-click": "pavucontrol"
+}
+```
+
+### Network module
+
+```json .config/waybar/Waybar-3.0/config.json
+"network": {
+  "format-wifi": " {essid}",
+  "on-click": "iwgtk",
+  "format-ethernet": " wired",
+  "tooltip": false,
+  "format-disconnected": ""
+}
+```
+
+### Clock module
+
+```json .config/waybar/Waybar-3.0/config.json
+"clock": {
+  "format": "<b>{:%I:%M %p}</b>",
+  "format-alt": "<b>{:%a.%d,%b}</b>",
+  "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>"
+}
+```
+
+## Tokyo style configuration
+
+### Simplified layout
+
+```json .config/waybar/tokyoconfig
+{
+  "layer": "top",
+  "height": 10,
+  "modules-left": ["custom/arch", "hyprland/workspaces", "memory"],
+  "modules-center": ["custom/playerctl"],
+  "modules-right": ["backlight", "pulseaudio", "battery", "network", "clock"]
+}
+```
+
+### Media player module
+
+The Tokyo configuration includes a custom playerctl module for media control:
+
+```json .config/waybar/tokyoconfig
+"custom/playerctl": {
+  "format": "{icon}  <span>{}</span>",
+  "return-type": "json",
+  "max-length": 55,
+  "exec": "playerctl -a metadata --format '{\"text\": \"  {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+  "on-click-middle": "playerctl previous",
+  "on-click": "playerctl play-pause",
+  "on-click-right": "playerctl next",
+  "format-icons": {
+    "Paused": "<span foreground='#bb9af7'></span>",
+    "Playing": "<span foreground='#bb9af7'></span>"
+  }
+}
+```
+
+## Custom modules and scripts
+
+The configuration includes several custom scripts located in `.config/waybar/scripts/`:
+
+### Media player script
+
+<CodeGroup>
+
+```python .config/waybar/scripts/mediaplayer.py
+#!/usr/bin/env python3
+import gi
+gi.require_version('Playerctl', '2.0')
+from gi.repository import Playerctl, GLib
+
+def on_metadata(player, metadata, manager):
+    track_info = ''
+    
+    if player.props.player_name == 'spotify' and \
+            'mpris:trackid' in metadata.keys() and \
+            ':ad:' in player.props.metadata['mpris:trackid']:
+        track_info = 'AD PLAYING'
+    elif player.get_artist() != '' and player.get_title() != '':
+        track_info = '{artist} - {title}'.format(
+            artist=player.get_artist(),
+            title=player.get_title()
+        )
+    else:
+        track_info = player.get_title()
+```
+
+</CodeGroup>
+
+<Tip>
+  This script provides rich media information and can detect Spotify advertisements.
+</Tip>
+
+### Weather script
+
+```python .config/waybar/scripts/waybar-wttr.py
+#!/usr/bin/env python
+import json
+import requests
+
+weather = requests.get("https://wttr.in/?format=j1").json()
+
+data['text'] = WEATHER_CODES[weather['current_condition'][0]['weatherCode']] + \
+    " " + weather['current_condition'][0]['FeelsLikeC'] + "°C"
+
+data['tooltip'] = f"<b>{weather['current_condition'][0]['weatherDesc'][0]['value']} {weather['current_condition'][0]['temp_C']}°C</b>\n"
+```
+
+<Note>
+  The weather script fetches real-time weather data from wttr.in and displays it with emoji icons.
+</Note>
+
+### Spotify script
+
+```bash .config/waybar/scripts/spotify.sh
+#!/usr/bin/env bash
+while true; do
+    player_status=$(playerctl status 2>/dev/null)
+    
+    if [ -z "$(playerctl metadata album)" ]; then
+        if [ "$player_status" = "Playing" ]; then
+            echo "$(playerctl metadata artist) - $(playerctl metadata title)"
+        elif [ "$player_status" = "Paused" ]; then
+            echo " $(playerctl metadata artist) - $(playerctl metadata title)"
+        else
+            echo ""
+        fi
+    else
+        if [ "$player_status" = "Playing" ]; then
+            echo "<span color='#1db954'></span> $(playerctl metadata artist) - $(playerctl metadata title)"
+        elif [ "$player_status" = "Paused" ]; then
+            echo "<span color='#1db954'></span>  $(playerctl metadata artist) - $(playerctl metadata title)"
+        else
+            echo ""
+        fi
+    fi
+    
+    sleep 1
+done
+```
+
+### Custom modules available
+
+<CardGroup cols={2}>
+  <Card title="mediaplayer.py" icon="music">
+    Advanced media player integration with Playerctl
+  </Card>
+  <Card title="waybar-wttr.py" icon="cloud">
+    Weather information from wttr.in API
+  </Card>
+  <Card title="spotify.sh" icon="spotify">
+    Spotify-specific media controls
+  </Card>
+  <Card title="rofi-wifi-menu.sh" icon="wifi">
+    WiFi network selection menu
+  </Card>
+  <Card title="rofi-bluetooth" icon="bluetooth">
+    Bluetooth device management
+  </Card>
+  <Card title="powermenu.sh" icon="power-off">
+    Power menu with multiple styles
+  </Card>
+</CardGroup>
+
+## Styling
+
+The Tokyo Night theme styling uses a dark color scheme:
+
+```css .config/waybar/Waybar-3.0/style-tokyo.css
+* {
+  padding: 0;
+  margin: 0;
+  font-family: JetBrainsMono Nerd Font;
+  font-size: 16px;
+}
+
+window#waybar {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.modules-left, .modules-center, .modules-right {
+  background-color: #1e2030;
+  border-radius: 8px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+#custom-launcher {
+  font-size: 20px;
+  color: #ff005f;
+  padding-right: 10px;
+}
+
+#cpu, #memory {
+  font-size: 15px;
+  background: #363a4f;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+```
+
+## Power menu styles
+
+The configuration includes multiple power menu styles in `.config/waybar/scripts/power-menu/`:
+
+- `style-1.rasi` through `style-5.rasi`
+- Multiple color schemes (Tokyo Night, Nord, Gruvbox, Catppuccin, etc.)
+
+## Custom window name module
+
+```json .config/waybar/Waybar-3.0/config.json
+"custom/window-name": {
+  "format": "<b>{}</b>",
+  "interval": 1,
+  "exec": "hyprctl activewindow | grep class | awk '{print $2}'"
+}
+```
+
+This module displays the currently active window class.
+
+## Package update checker
+
+```json .config/waybar/Waybar-3.0/config.json
+"custom/pacman-update-icon": {
+  "format": ""
+},
+"custom/pacman-update": {
+  "format": " {}",
+  "interval": 3600,
+  "exec": "checkupdates | wc -l",
+  "signal": 8
+}
+```
+
+<Warning>
+  The update checker runs every hour. Adjust the interval if you want more frequent checks.
+</Warning>
+
+## Customization tips
+
+<Steps>
+  <Step title="Choose a configuration">
+    Select between Waybar 3.0 (feature-rich) or Tokyo style (minimalist)
+  </Step>
+  <Step title="Modify modules">
+    Edit the modules-left, modules-center, and modules-right arrays to rearrange components
+  </Step>
+  <Step title="Add custom scripts">
+    Place your scripts in `.config/waybar/scripts/` and reference them in custom modules
+  </Step>
+  <Step title="Customize colors">
+    Edit the CSS file to match your theme colors
+  </Step>
+</Steps>
+
+## Testing configuration
+
+Reload Waybar after making changes:
+
+```bash
+killall waybar && waybar &
+```
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Hyprland" icon="desktop" href="/desktop/hyprland">
+    Window manager configuration
+  </Card>
+  <Card title="Wofi" icon="search" href="/desktop/wofi">
+    Application launcher
+  </Card>
+</CardGroup>
+
+## Resources
+
+- [Waybar Wiki](https://github.com/Alexays/Waybar/wiki)
+- [Waybar Configuration Examples](https://github.com/Alexays/Waybar/wiki/Examples)
+- [Module Reference](https://github.com/Alexays/Waybar/wiki/Module:-Custom)

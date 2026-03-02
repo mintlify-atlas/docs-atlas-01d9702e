@@ -1,0 +1,157 @@
+---
+title: Kanata keyboard remapping
+description: Configure custom keyboard layouts with Kanata
+icon: keyboard
+---
+
+Kanata is a software keyboard remapper that allows you to customize your keyboard layout at a low level. This dotfiles configuration uses Kanata to implement advanced key remapping with tap-hold functionality.
+
+## Configuration
+
+The Kanata configuration is located at `.config/kanata/config.kbd`. It uses a Lisp-like syntax to define key mappings and behaviors.
+
+### Tap-hold configuration
+
+The configuration implements tap-hold functionality where a single key performs different actions based on whether it's tapped or held:
+
+```lisp .config/kanata/config.kbd
+(defsrc
+  caps
+)
+
+(defalias
+  escctrl (tap-hold 100 100 esc lctrl)
+  bspcctrl (tap-hold 100 100 bspc lctrl)
+)
+
+(deflayer base
+  @bspcctrl
+)
+```
+
+<Note>
+The `tap-hold` syntax is `(tap-hold tap-timeout hold-timeout tap-action hold-action)`. Both timeouts are set to 100ms in this configuration.
+</Note>
+
+### Key mappings
+
+The configuration remaps the Caps Lock key to:
+- **Tap**: Backspace
+- **Hold**: Left Control
+
+This provides ergonomic access to both frequently-used keys without moving your hands from the home row.
+
+<Tip>
+The configuration also defines an alternative `escctrl` alias that maps to Escape on tap and Control on hold. You can swap this in the `deflayer` section if you prefer Escape over Backspace.
+</Tip>
+
+## Systemd service setup
+
+Kanata runs as a systemd user service to start automatically and handle keyboard input at the system level.
+
+### Service configuration
+
+The service file is located at `.config/systemd/user/kanata.service`:
+
+```ini .config/systemd/user/kanata.service
+[Unit]
+Description=Kanata keyboard remapper
+Documentation=https://github.com/jtroo/kanata
+
+[Service]
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin
+Type=simple
+ExecStart=/usr/bin/sh -c 'exec $$(which kanata) --cfg $${HOME}/.config/kanata/config.kbd'
+Restart=no
+
+[Install]
+WantedBy=default.target
+```
+
+### Enable and start the service
+
+After installing the dotfiles with Stow, enable and start the Kanata service:
+
+<Steps>
+  <Step title="Reload systemd user daemon">
+    ```bash
+    systemctl --user daemon-reload
+    ```
+  </Step>
+  
+  <Step title="Enable the service">
+    ```bash
+    systemctl --user enable kanata.service
+    ```
+  </Step>
+  
+  <Step title="Start the service">
+    ```bash
+    systemctl --user start kanata.service
+    ```
+  </Step>
+  
+  <Step title="Verify the service is running">
+    ```bash
+    systemctl --user status kanata.service
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+Kanata requires permissions to read keyboard input. You may need to add your user to the `input` group or configure udev rules. See the [Kanata documentation](https://github.com/jtroo/kanata) for platform-specific setup instructions.
+</Warning>
+
+## Performance tuning
+
+The service file includes commented-out options for increasing process priority if you encounter input lag on resource-constrained systems:
+
+```ini
+# CPUSchedulingPolicy=rr
+# CPUSchedulingPriority=99
+# IOSchedulingClass=realtime
+# Nice=-20
+```
+
+<Warning>
+Enabling these options requires running the service as root or with elevated privileges. Only enable them if you experience noticeable input lag.
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Service fails to start">
+    Check the service logs:
+    ```bash
+    journalctl --user -u kanata.service -f
+    ```
+    
+    Common issues:
+    - Kanata binary not in PATH
+    - Config file syntax errors
+    - Insufficient permissions to access input devices
+  </Accordion>
+  
+  <Accordion title="Key mappings not working">
+    1. Verify the service is running: `systemctl --user status kanata.service`
+    2. Check for config file syntax errors in the logs
+    3. Ensure no other keyboard remappers are running (xcape, xmodmap, etc.)
+  </Accordion>
+  
+  <Accordion title="Input lag or delayed response">
+    - Try adjusting the tap-hold timeout values in the config
+    - Consider enabling the performance tuning options
+    - Check system resource usage
+  </Accordion>
+</AccordionGroup>
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Systemd services" icon="gear" href="/advanced/systemd">
+    Learn more about managing systemd user services
+  </Card>
+  <Card title="Kanata GitHub" icon="github" href="https://github.com/jtroo/kanata">
+    Official Kanata documentation and examples
+  </Card>
+</CardGroup>

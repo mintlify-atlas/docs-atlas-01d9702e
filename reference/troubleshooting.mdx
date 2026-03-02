@@ -1,0 +1,411 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for the dotfiles configuration
+---
+
+This page covers common issues you might encounter when setting up or using these dotfiles, along with their solutions.
+
+## Installation issues
+
+<Accordion title="Missing dependencies after installation">
+If you encounter errors about missing commands or tools after installation:
+
+**Solution:**
+1. Verify all packages from the installation sections in the README are installed
+2. Check which package manager you're using (Arch/yay vs Ubuntu/apt)
+3. Some tools like `eza` and `zoxide` may need to be installed via cargo on non-Arch systems:
+   ```bash
+   cargo install eza zoxide
+   ```
+4. Ensure your PATH includes cargo binaries: `~/.cargo/bin`
+
+**Verification:**
+```bash
+which eza zoxide fzf
+```
+All commands should return their installation paths.
+</Accordion>
+
+<Accordion title="Stow conflicts when linking dotfiles">
+When running `stow .` you may encounter conflicts if files already exist.
+
+**Solution:**
+1. Backup your existing dotfiles:
+   ```bash
+   mkdir ~/dotfiles-backup
+   mv ~/.zshrc ~/.config/nvim ~/dotfiles-backup/
+   ```
+2. Try restowing to refresh symlinks:
+   ```bash
+   stow --restow .
+   ```
+3. For persistent conflicts, use the `--adopt` flag (this will replace the repo files with your local ones):
+   ```bash
+   stow --adopt .
+   git restore .  # Restore original dotfiles after adopting
+   ```
+
+**Prevention:**
+Always backup your configuration before stowing new dotfiles.
+</Accordion>
+
+<Accordion title="Shell not changing to Zsh">
+After setting Zsh as default shell, your terminal still shows bash or another shell.
+
+**Solution:**
+1. Verify Zsh is set as default:
+   ```bash
+   echo $SHELL
+   ```
+   Should show: `/usr/bin/zsh` or `/bin/zsh`
+
+2. If not set correctly, run:
+   ```bash
+   chsh -s $(which zsh)
+   ```
+
+3. Completely log out and log back in (or reboot)
+4. On some systems, you may need to update `/etc/passwd` manually or use `sudo chsh -s $(which zsh) $USER`
+
+**Verification:**
+Open a new terminal and run:
+```bash
+echo $SHELL
+ps -p $$
+```
+</Accordion>
+
+## Hyprland issues
+
+<Accordion title="Hyprland won't start or crashes on launch">
+Hyprland fails to start from the display manager or crashes immediately.
+
+**Solution:**
+1. Check Hyprland logs:
+   ```bash
+   journalctl --user -u hyprland -b
+   ```
+
+2. Verify required dependencies are installed:
+   ```bash
+   yay -S hyprland hyprpaper waybar wofi mako
+   ```
+
+3. Check for configuration syntax errors:
+   ```bash
+   hyprland --config ~/.config/hypr/hyprland.conf --dry-run
+   ```
+
+4. Ensure your GPU drivers are properly installed:
+   - **NVIDIA**: Install `nvidia-dkms` and enable DRM kernel mode
+   - **AMD/Intel**: Ensure mesa drivers are installed
+
+5. Try starting Hyprland from TTY (Ctrl+Alt+F2):
+   ```bash
+   Hyprland
+   ```
+
+**Common causes:**
+- Missing Wayland support in GPU drivers
+- Conflicting window manager processes
+- Invalid configuration syntax
+</Accordion>
+
+<Accordion title="AGS or Waybar not appearing">
+The status bar doesn't show up when Hyprland starts.
+
+**Solution:**
+1. Check if the process is running:
+   ```bash
+   ps aux | grep -E 'ags|waybar'
+   ```
+
+2. Try launching manually to see errors:
+   ```bash
+   agsv1  # or waybar
+   ```
+
+3. Verify the autostart line in `~/.config/hypr/hyprland.conf`:
+   ```conf
+   exec-once = agsv1 & hyprpaper
+   ```
+
+4. Check AGS/Waybar configuration files for errors
+5. Install missing dependencies (check AGS documentation)
+
+**Workaround:**
+Switch to Waybar if AGS is problematic:
+```conf
+exec-once = waybar & hyprpaper
+```
+</Accordion>
+
+<Accordion title="Screen lock (Swaylock) not working">
+Swaylock doesn't activate or shows errors.
+
+**Solution:**
+1. Verify swaylock is installed:
+   ```bash
+   which swaylock
+   ```
+
+2. Check the wallpaper path in `~/.config/hypr/hyprland.conf`:
+   ```conf
+   bindl=SUPER,L,exec, swaylock -f -e -l -L -s fill -i ~/dotfiles/Wallpaper/street-tn.png
+   ```
+
+3. Update the path to an existing wallpaper or remove the `-i` flag:
+   ```bash
+   swaylock -f -e -l -L
+   ```
+
+4. Ensure you have permission to use swaylock (may need to be in certain groups)
+</Accordion>
+
+## Tmux issues
+
+<Accordion title="Tmux plugins not installing">
+Plugins don't install after pressing `Ctrl+a I`.
+
+**Solution:**
+1. Install TPM manually:
+   ```bash
+   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+   ```
+
+2. Reload tmux configuration:
+   ```bash
+   tmux source ~/.config/tmux/tmux.conf
+   ```
+
+3. Inside tmux, press `Ctrl+a` then `I` (capital i) to install plugins
+4. Wait for installation to complete (may take 30-60 seconds)
+
+**Verification:**
+```bash
+ls ~/.tmux/plugins/
+```
+Should show multiple plugin directories.
+</Accordion>
+
+<Accordion title="Tmux colors look wrong">
+Colors appear incorrect or washed out in tmux.
+
+**Solution:**
+1. Ensure your terminal supports true color. Add to your shell rc file:
+   ```bash
+   export TERM=xterm-256color
+   ```
+
+2. Verify tmux configuration has true color support:
+   ```conf
+   set-option -sa terminal-overrides ",xterm*:Tc"
+   ```
+
+3. Restart tmux completely:
+   ```bash
+   tmux kill-server
+   tmux
+   ```
+
+4. Check if your terminal emulator (Ghostty/Kitty) is set to support true color
+</Accordion>
+
+<Accordion title="Tmux prefix key not working">
+The `Ctrl+a` prefix doesn't respond.
+
+**Solution:**
+1. Verify the prefix is set in `~/.config/tmux/tmux.conf`:
+   ```conf
+   set-option -g prefix C-a
+   bind-key C-a send-prefix
+   ```
+
+2. Reload configuration:
+   ```bash
+   tmux source ~/.config/tmux/tmux.conf
+   ```
+
+3. Check for conflicting keybindings in your shell (Ctrl+a is also readline's beginning-of-line)
+4. Try the old prefix `Ctrl+b` to see if tmux responds at all
+</Accordion>
+
+## Kanata issues
+
+<Accordion title="Kanata not working or keys not remapped">
+Kanata service is running but Caps Lock doesn't behave as configured.
+
+**Solution:**
+1. Check service status:
+   ```bash
+   systemctl --user status kanata
+   ```
+
+2. View service logs for errors:
+   ```bash
+   journalctl --user -u kanata -f
+   ```
+
+3. Verify configuration syntax:
+   ```bash
+   kanata --check --cfg ~/.config/kanata/config.kbd
+   ```
+
+4. Ensure you have proper permissions. Kanata may need:
+   - Access to `/dev/uinput`
+   - User to be in `input` or `uinput` group:
+     ```bash
+     sudo usermod -aG input $USER
+     sudo usermod -aG uinput $USER
+     ```
+   - Logout and login for group changes to take effect
+
+5. Restart the service:
+   ```bash
+   systemctl --user restart kanata
+   ```
+
+**Alternative:**
+Run kanata manually to see errors:
+```bash
+kanata --cfg ~/.config/kanata/config.kbd
+```
+</Accordion>
+
+<Accordion title="Kanata service fails to start on boot">
+Kanata doesn't start automatically after system boot.
+
+**Solution:**
+1. Enable the service:
+   ```bash
+   systemctl --user enable kanata.service
+   ```
+
+2. Check service file location:
+   ```bash
+   ls ~/.config/systemd/user/kanata.service
+   ```
+
+3. Reload systemd daemon:
+   ```bash
+   systemctl --user daemon-reload
+   ```
+
+4. Verify the ExecStart path in the service file points to the correct kanata binary:
+   ```bash
+   which kanata
+   ```
+
+5. Check for errors preventing service start:
+   ```bash
+   systemctl --user status kanata
+   ```
+</Accordion>
+
+## Font issues
+
+<Accordion title="Icons or glyphs not displaying correctly">
+You see boxes or missing characters instead of icons.
+
+**Solution:**
+1. Install Nerd Fonts:
+   ```bash
+   yay -S ttf-jetbrains-mono-nerd
+   ```
+
+2. Refresh font cache:
+   ```bash
+   fc-cache -fv
+   ```
+
+3. Verify the font is installed:
+   ```bash
+   fc-list | grep -i jetbrains
+   ```
+
+4. Update terminal configuration to use Nerd Font:
+   - **Ghostty**: Set `font-family = JetBrainsMono Nerd Font`
+   - **Kitty**: Set `font_family JetBrains Mono Nerd Font`
+
+5. Restart your terminal
+
+**For Oh My Posh:**
+Ensure you're using a Nerd Font. Oh My Posh requires Nerd Font glyphs for icons.
+</Accordion>
+
+## Development tool issues
+
+<Accordion title="LazyVim/Neovim plugins not loading">
+Neovim starts but plugins aren't working or showing errors.
+
+**Solution:**
+1. Open Neovim and run:
+   ```vim
+   :Lazy sync
+   ```
+
+2. Check for errors:
+   ```vim
+   :checkhealth
+   ```
+
+3. Ensure required dependencies are installed:
+   ```bash
+   # Clipboard support
+   yay -S xclip wl-clipboard
+   
+   # Language servers and tools
+   yay -S ripgrep fd
+   ```
+
+4. Update LazyVim:
+   ```vim
+   :Lazy update
+   ```
+
+5. If using a git submodule for nvim config, update it:
+   ```bash
+   cd ~/dotfiles
+   git submodule update --init --recursive
+   ```
+</Accordion>
+
+<Accordion title="Command not found after installation">
+Commands like `eza`, `zoxide`, or custom aliases don't work.
+
+**Solution:**
+1. Ensure the tool is installed:
+   ```bash
+   which eza  # or the command in question
+   ```
+
+2. Check your PATH:
+   ```bash
+   echo $PATH
+   ```
+
+3. Source your shell configuration:
+   ```bash
+   source ~/.zshrc
+   ```
+
+4. For cargo-installed tools, ensure `~/.cargo/bin` is in PATH:
+   ```bash
+   export PATH="$HOME/.cargo/bin:$PATH"
+   ```
+
+5. Restart your shell or terminal completely
+</Accordion>
+
+## Getting more help
+
+If you encounter issues not covered here:
+
+1. Check the logs for the specific component
+2. Review the configuration files for syntax errors
+3. Consult the official documentation for each tool
+4. Open an issue on the dotfiles repository with:
+   - Your system information (`uname -a`)
+   - Steps to reproduce the issue
+   - Relevant log output
+   - What you've already tried

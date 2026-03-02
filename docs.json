@@ -1,122 +1,87 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "J4yTr1n1ty Dotfiles",
+  "theme": "aspen",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "primary": "#7aa2f7",
+    "light": "#bb9af7",
+    "dark": "#1a1b26"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "type": "github",
+      "href": "https://github.com/J4yTr1n1ty/dotfiles"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/J4yTr1n1ty/dotfiles"
     }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "prerequisites",
+          "installation"
+        ]
+      },
+      {
+        "group": "Shell Configuration",
+        "pages": [
+          "shell/zsh",
+          "shell/bash",
+          "shell/oh-my-posh",
+          "shell/aliases"
+        ]
+      },
+      {
+        "group": "Terminal & Multiplexer",
+        "pages": [
+          "terminal/ghostty",
+          "terminal/kitty",
+          "terminal/alacritty",
+          "terminal/tmux"
+        ]
+      },
+      {
+        "group": "Desktop Environment",
+        "pages": [
+          "desktop/hyprland",
+          "desktop/waybar",
+          "desktop/wofi",
+          "desktop/mako",
+          "desktop/wallpapers"
+        ]
+      },
+      {
+        "group": "Development Tools",
+        "pages": [
+          "dev/neovim",
+          "dev/lazygit",
+          "dev/ranger",
+          "dev/languages"
+        ]
+      },
+      {
+        "group": "Advanced",
+        "pages": [
+          "advanced/kanata",
+          "advanced/stow",
+          "advanced/scripts",
+          "advanced/systemd"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/keybindings",
+          "reference/troubleshooting",
+          "reference/customization"
+        ]
+      }
+    ]
   }
 }

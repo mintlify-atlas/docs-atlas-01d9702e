@@ -1,0 +1,331 @@
+---
+title: Wofi
+description: Wofi application launcher configuration for Wayland
+---
+
+Wofi is a launcher/menu program for Wayland, similar to rofi but built specifically for Wayland compositors.
+
+## Overview
+
+Wofi serves as the application launcher in this Hyprland setup, providing a clean and customizable interface for launching applications, switching windows, and more.
+
+## Configuration location
+
+The Wofi configuration is located at `.config/wofi/config`.
+
+## Configuration file
+
+```conf .config/wofi/config
+width=600
+height=500
+location=center
+show=drun
+prompt=Apps
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitive=true
+allow_images=true
+image_size=40
+gtk_dark=true
+```
+
+## Configuration options
+
+<AccordionGroup>
+  <Accordion title="Window settings">
+    - `width=600`: Launcher window width in pixels
+    - `height=500`: Launcher window height in pixels
+    - `location=center`: Position on screen (center, top-left, bottom-right, etc.)
+  </Accordion>
+  
+  <Accordion title="Display mode">
+    - `show=drun`: Show desktop applications (alternatives: run, dmenu)
+    - `prompt=Apps`: Text prompt displayed in the search bar
+  </Accordion>
+  
+  <Accordion title="Behavior">
+    - `filter_rate=100`: Milliseconds between filter updates
+    - `allow_markup=true`: Enable Pango markup in entries
+    - `no_actions=true`: Disable desktop file actions
+    - `insensitive=true`: Case-insensitive search
+  </Accordion>
+  
+  <Accordion title="Layout">
+    - `halign=fill`: Horizontal alignment of content
+    - `orientation=vertical`: Vertical list orientation
+    - `content_halign=fill`: Content horizontal alignment
+  </Accordion>
+  
+  <Accordion title="Visual settings">
+    - `allow_images=true`: Show application icons
+    - `image_size=40`: Icon size in pixels
+    - `gtk_dark=true`: Use dark GTK theme
+  </Accordion>
+</AccordionGroup>
+
+## Usage modes
+
+Wofi supports several modes:
+
+<CardGroup cols={2}>
+  <Card title="drun" icon="grid">
+    Desktop application launcher (default)
+  </Card>
+  <Card title="run" icon="terminal">
+    Command runner for executables
+  </Card>
+  <Card title="dmenu" icon="list">
+    Generic menu from stdin
+  </Card>
+  <Card title="show" icon="window-restore">
+    Window switcher
+  </Card>
+</CardGroup>
+
+## Launching Wofi
+
+### From Hyprland
+
+Wofi is configured as the default menu in Hyprland:
+
+```conf .config/hypr/hyprland.conf
+$menu = wofi --show drun
+bind = $mainMod, R, exec, $menu
+```
+
+<Tip>
+  Press `SUPER + R` to launch Wofi from Hyprland
+</Tip>
+
+### Command line usage
+
+```bash
+# Launch application menu
+wofi --show drun
+
+# Launch command runner
+wofi --show run
+
+# Use as dmenu replacement
+echo -e "Option 1\nOption 2\nOption 3" | wofi --dmenu
+
+# Window switcher
+wofi --show window
+```
+
+## Styling
+
+Wofi uses CSS for styling. The style configuration is typically in `.config/wofi/style.css` or `.config/wofi/menu.css`.
+
+### Example custom CSS
+
+```css .config/wofi/menu.css
+window {
+    margin: 0px;
+    border: 2px solid #1e1e2e;
+    background-color: #1e1e2e;
+    border-radius: 10px;
+}
+
+#input {
+    margin: 5px;
+    border: none;
+    color: #cdd6f4;
+    background-color: #313244;
+    border-radius: 5px;
+}
+
+#inner-box {
+    margin: 5px;
+    border: none;
+    background-color: #1e1e2e;
+}
+
+#outer-box {
+    margin: 5px;
+    border: none;
+    background-color: #1e1e2e;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#text {
+    margin: 5px;
+    border: none;
+    color: #cdd6f4;
+}
+
+#entry:selected {
+    background-color: #45475a;
+    border-radius: 5px;
+}
+```
+
+## WiFi menu integration
+
+The configuration includes a WiFi menu script:
+
+```bash .config/wofi/woif-wifi.sh
+#!/bin/bash
+# Wofi WiFi menu integration
+# Lists available WiFi networks and connects to selected network
+```
+
+This can be launched from Waybar or as a custom keybinding.
+
+## Advanced configuration
+
+### Custom width and height
+
+Adjust the launcher size based on your screen resolution:
+
+```conf
+# For 1080p displays
+width=800
+height=600
+
+# For 1440p displays
+width=1000
+height=700
+
+# For 4K displays
+width=1200
+height=900
+```
+
+### Performance tuning
+
+```conf
+filter_rate=100    # Lower = more responsive, higher CPU usage
+gtk_dark=true      # Match system theme
+insensitive=true   # Case-insensitive search
+```
+
+### Image and icon settings
+
+```conf
+allow_images=true
+image_size=40      # Adjust based on preference (32, 48, 64)
+```
+
+## Comparison with other launchers
+
+<CardGroup cols={3}>
+  <Card title="Wofi" icon="check">
+    Native Wayland support, lightweight, simple configuration
+  </Card>
+  <Card title="Rofi" icon="desktop">
+    More features, X11 focused, complex configuration
+  </Card>
+  <Card title="Bemenu" icon="bars">
+    Minimal, dmenu-like, very lightweight
+  </Card>
+</CardGroup>
+
+## Keybindings within Wofi
+
+When Wofi is open:
+
+- **Arrow keys / hjkl**: Navigate through entries
+- **Enter**: Launch selected application
+- **Escape**: Close Wofi
+- **Tab**: Complete search term
+- **Ctrl+C**: Cancel and close
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Wofi not showing icons">
+    Ensure `allow_images=true` and check that icon themes are properly installed:
+    ```bash
+    # Install icon theme
+    sudo pacman -S papirus-icon-theme
+    ```
+  </Accordion>
+  
+  <Accordion title="Launcher appears in wrong location">
+    Adjust the `location` parameter:
+    ```conf
+    location=center    # center, top, bottom, left, right
+    ```
+  </Accordion>
+  
+  <Accordion title="Search is too slow">
+    Decrease the filter rate:
+    ```conf
+    filter_rate=50     # Lower value = faster updates
+    ```
+  </Accordion>
+  
+  <Accordion title="Applications not appearing">
+    Wofi reads from XDG desktop entries. Verify applications have .desktop files:
+    ```bash
+    ls /usr/share/applications/
+    ls ~/.local/share/applications/
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Customization examples
+
+### Minimal launcher
+
+```conf
+width=400
+height=300
+show=drun
+allow_images=false
+gtk_dark=true
+```
+
+### Large display launcher
+
+```conf
+width=1000
+height=800
+show=drun
+allow_images=true
+image_size=64
+```
+
+### Command runner mode
+
+```conf
+width=800
+height=100
+show=run
+allow_images=false
+location=top
+```
+
+## Integration scripts
+
+The configuration includes several integration scripts:
+
+- `woif-wifi.sh`: WiFi network selector
+- Menu integration with Waybar
+- Custom dmenu replacement scripts
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Hyprland" icon="desktop" href="/desktop/hyprland">
+    Wofi keybindings in Hyprland
+  </Card>
+  <Card title="Waybar" icon="chart-bar" href="/desktop/waybar">
+    Launch Wofi from Waybar
+  </Card>
+</CardGroup>
+
+## Resources
+
+- [Wofi Man Page](https://man.archlinux.org/man/wofi.1)
+- [Wofi on Arch Wiki](https://wiki.archlinux.org/title/Wofi)
+- [Wofi Configuration Options](https://man.archlinux.org/man/wofi.5)

@@ -1,0 +1,299 @@
+---
+title: Prerequisites
+description: Required tools, dependencies, and system requirements for installing the dotfiles
+---
+
+# Prerequisites
+
+Before installing the dotfiles, you'll need to ensure your system has the necessary base tools and dependencies. The requirements vary depending on which components you plan to install.
+
+## System requirements
+
+### Supported distributions
+
+<CardGroup cols={2}>
+  <Card title="Arch Linux" icon="linux">
+    **Fully supported** - Automated installation via pacman and yay
+  </Card>
+  <Card title="Ubuntu/Debian" icon="ubuntu">
+    **Supported** - Most tools available, some require manual installation
+  </Card>
+</CardGroup>
+
+<Note>
+The installation script automatically detects your distribution and uses the appropriate package manager.
+</Note>
+
+### Display server
+
+If you plan to use the Hyprland desktop environment:
+
+- **Wayland** support is required
+- Hyprland is a Wayland compositor and will not work on X11
+- On Debian/Ubuntu, Hyprland requires manual compilation
+
+## Essential tools
+
+These tools are required for the basic dotfiles installation process:
+
+### Base utilities
+
+<Steps>
+  <Step title="Install GNU Stow">
+    GNU Stow manages symlinks from the dotfiles repository to your home directory.
+    
+    **Arch Linux:**
+    ```bash
+    sudo pacman -S stow
+    ```
+    
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt update && sudo apt install stow
+    ```
+  </Step>
+  
+  <Step title="Install Git">
+    Git is required to clone the repository and manage submodules.
+    
+    **Arch Linux:**
+    ```bash
+    sudo pacman -S git
+    ```
+    
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt install git
+    ```
+  </Step>
+  
+  <Step title="Install basic utilities">
+    Core utilities for downloading and extracting packages.
+    
+    **Arch Linux:**
+    ```bash
+    sudo pacman -S curl wget unzip
+    ```
+    
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt install curl wget unzip
+    ```
+  </Step>
+</Steps>
+
+### AUR helper (Arch Linux only)
+
+For Arch users, the installation script uses `yay` to install AUR packages. If you don't have it installed, the script will install it automatically, but you'll need base development tools:
+
+```bash
+sudo pacman -S --needed base-devel git
+```
+
+<Note>
+The installer will automatically install yay if it's not present on Arch systems.
+</Note>
+
+## Core shell environment dependencies
+
+If you plan to install the core shell environment, these packages will be installed automatically, but you should be aware of them:
+
+### Command-line tools
+
+**Arch Linux:**
+```bash
+yay -S zsh tmux fzf eza zoxide lazygit neovim ranger pfetch bat fd ripgrep
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install zsh tmux fzf neovim ranger bat fd-find ripgrep
+```
+
+<Warning>
+On Ubuntu/Debian, `eza`, `zoxide`, and `lazygit` are not available in official repositories. The installer will download and install them automatically from their GitHub releases.
+</Warning>
+
+### Tool descriptions
+
+- **zsh**: Modern shell with powerful scripting capabilities
+- **tmux**: Terminal multiplexer for managing multiple sessions
+- **fzf**: Fuzzy finder for files, commands, and history
+- **eza**: Modern replacement for `ls` with colors and icons
+- **zoxide**: Smart directory jumper that learns your habits
+- **lazygit**: Terminal UI for Git commands
+- **neovim**: Hyperextensible Vim-based text editor
+- **ranger**: Console file manager with vi-key bindings
+- **pfetch**: Minimal system information tool
+- **bat**: Cat clone with syntax highlighting
+- **fd**: Fast and user-friendly alternative to `find`
+- **ripgrep**: Fast recursive grep alternative
+
+## Font requirements
+
+The dotfiles use Nerd Fonts for icon support in the terminal and status bar.
+
+<Steps>
+  <Step title="JetBrains Mono Nerd Font (Primary)">
+    **Arch Linux:**
+    ```bash
+    yay -S ttf-jetbrains-mono-nerd
+    ```
+    
+    **Ubuntu/Debian:**
+    
+    The installer will download from the [Nerd Fonts repository](https://github.com/ryanoasis/nerd-fonts) automatically.
+  </Step>
+  
+  <Step title="Refresh font cache">
+    After installing fonts, refresh the font cache:
+    ```bash
+    fc-cache -fv
+    ```
+  </Step>
+</Steps>
+
+<Note>
+The installer can handle font installation for you. These are just the manual steps if you prefer to install fonts beforehand.
+</Note>
+
+## Hyprland dependencies
+
+For the complete Hyprland desktop environment:
+
+### Core Hyprland components
+
+**Arch Linux:**
+```bash
+yay -S hyprland hyprpaper waybar wofi mako swaylock brightnessctl pamixer playerctl
+```
+
+- **hyprland**: The Wayland compositor
+- **hyprpaper**: Wallpaper daemon for Hyprland
+- **waybar**: Highly customizable status bar
+- **wofi**: Application launcher for Wayland
+- **mako**: Notification daemon for Wayland
+- **swaylock**: Screen locker for Wayland
+- **brightnessctl**: Control screen brightness
+- **pamixer**: Pulseaudio mixer CLI tool
+- **playerctl**: Media player controller
+
+### Terminal emulators
+
+**Arch Linux:**
+```bash
+yay -S ghostty kitty alacritty
+```
+
+- **ghostty**: Primary terminal (now in official Arch repos)
+- **kitty**: GPU-accelerated terminal emulator
+- **alacritty**: Fast, OpenGL terminal emulator
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install kitty alacritty
+```
+
+<Warning>
+Ghostty requires manual compilation on Ubuntu/Debian. See the [Ghostty documentation](https://ghostty.org/docs/install/source) for build instructions.
+</Warning>
+
+### System utilities
+
+**Arch Linux:**
+```bash
+yay -S blueman networkmanager nm-connection-editor
+```
+
+- **blueman**: Bluetooth manager with GUI
+- **networkmanager**: Network connection manager
+- **nm-connection-editor**: NetworkManager GUI
+
+<Note>
+The installer will automatically enable NetworkManager and Bluetooth services on Arch Linux.
+</Note>
+
+## Development tools (optional)
+
+The installer can set up various development environments. Here's what you need to know:
+
+### .NET development
+
+**Arch Linux:**
+```bash
+yay -S dotnet-runtime dotnet-sdk aspnet-runtime
+```
+
+**Ubuntu/Debian:**
+
+Requires adding the Microsoft repository. The installer handles this automatically.
+
+### Go programming
+
+**Arch Linux:**
+```bash
+yay -S go
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install golang
+```
+
+### Rust development
+
+Rust is installed via rustup on all platforms:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+### Node.js
+
+Node.js is installed via NVM for better version management:
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install --lts
+```
+
+### Bun JavaScript runtime
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+## Storage requirements
+
+- **Minimal installation** (core shell only): ~500 MB
+- **Full installation** (all components): ~3-5 GB
+- **With development tools**: Add 2-10 GB depending on selected tools
+
+<Note>
+These are approximate sizes including dependencies. Actual size varies by distribution and existing packages.
+</Note>
+
+## Permissions
+
+The installation script requires root privileges to install system packages:
+
+```bash
+sudo ./install.sh
+```
+
+<Warning>
+The script detects if you're using sudo and will properly handle user permissions for user-specific installations (like NVM, Rust, etc.).
+</Warning>
+
+## Pre-installation checklist
+
+Before proceeding to installation, verify:
+
+- [ ] Running a supported Linux distribution (Arch or Ubuntu/Debian)
+- [ ] Have sudo privileges
+- [ ] Git, curl, and wget are installed
+- [ ] For Hyprland: Using or planning to use Wayland
+- [ ] Have at least 5 GB free disk space for full installation
+- [ ] Reviewed which components you want to install
+
+## Next steps
+
+Once you have the prerequisites installed, you're ready to proceed to the [Installation](/installation) guide.

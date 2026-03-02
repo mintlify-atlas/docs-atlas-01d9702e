@@ -1,0 +1,283 @@
+---
+title: Shell aliases
+description: Comprehensive list of shell aliases for improved productivity and convenience
+---
+
+## Overview
+
+Both Zsh and Bash configurations include numerous aliases to streamline common tasks. This page documents all aliases organized by category.
+
+## Editor aliases
+
+Quick access to Neovim with different command variations:
+
+```bash
+alias vim="nvim"
+alias vi="nvim"
+alias v="nvim"
+```
+
+**Usage:**
+
+<CodeGroup>
+  ```bash Standard
+  vim config.toml
+  ```
+
+  ```bash Short
+  vi config.toml
+  ```
+
+  ```bash Shortest
+  v config.toml
+  ```
+</CodeGroup>
+
+## Navigation aliases
+
+### Directory listing
+
+Enhanced `ls` commands using `eza` (Zsh) or standard `ls` (Bash):
+
+<Tabs>
+  <Tab title="Zsh (eza)">
+    ```bash ~/.zshrc
+    alias ls="eza --color=auto"
+    alias ll="ls -l"
+    alias la="ls -a"
+    ```
+
+    - `ls` - Colorized listing with eza
+    - `ll` - Long format
+    - `la` - Show hidden files
+  </Tab>
+  <Tab title="Bash (coreutils)">
+    ```bash ~/.bashrc
+    alias ls='ls --color=auto'
+    alias ll='ls -alF'
+    alias la='ls -A'
+    alias l='ls -CF'
+    ```
+
+    - `ls` - Colorized listing
+    - `ll` - Long format with file types
+    - `la` - Show all except . and ..
+    - `l` - Compact list with file types
+  </Tab>
+</Tabs>
+
+### Directory navigation
+
+```bash ~/.zshrc
+alias ..="cd .."
+```
+
+Quickly move up one directory level.
+
+### Zoxide aliases (Bash)
+
+Bash-specific zoxide convenience aliases:
+
+```bash ~/.bashrc
+alias cda='zoxide add'      # Add directory to zoxide
+alias cdq='zoxide query'    # Query zoxide database
+alias cdqi='zoxide query -i' # Interactive query
+alias cdr='zoxide remove'    # Remove directory
+```
+
+## Terminal aliases
+
+Quick terminal operations:
+
+```bash ~/.zshrc
+alias c="clear"  # Clear screen
+alias q="exit"   # Exit shell
+```
+
+<Tip>
+  Type `c` instead of `clear` and `q` instead of `exit` for faster terminal management.
+</Tip>
+
+## Git aliases
+
+### Lazygit
+
+```bash ~/.zshrc
+alias lg="lazygit"
+```
+
+Launch the lazygit TUI for intuitive git operations.
+
+### Grep aliases (Bash)
+
+Colorized grep output:
+
+```bash ~/.bashrc
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+```
+
+## Utility aliases
+
+### Weather
+
+```bash ~/.zshrc
+alias weather="curl wttr.in"
+```
+
+Get current weather information from the command line:
+
+```bash
+$ weather
+# Displays weather for your location
+
+$ weather London
+# Displays weather for London
+```
+
+### .NET testing
+
+Formatted .NET test output with colored results:
+
+```bash ~/.zshrc
+alias dotnet-test-pretty='dotnet test --no-restore --verbosity=normal | awk '\'''
+'/Failed /{print "\n\033[31mFailed: " $2 "\033[0m"}'
+'/Error Message:/{print "\033[33mError: " substr($0, index($0, ":")+1) "\033[0m"; st=0}'
+'/Stack Trace:/{st=1; next}'
+'st==1 && /at /{print "\033[36mStack: " $0 "\033[0m"; st=0}'
+'\'''
+```
+
+**Usage:**
+
+```bash
+dotnet-test-pretty
+```
+
+Provides colored output highlighting:
+- Failed tests in red
+- Error messages in yellow
+- Stack traces in cyan
+
+### Ranger file manager
+
+Conditional alias that only loads if Ranger is installed:
+
+```bash ~/.zshrc
+if command -v ranger &> /dev/null; then
+  alias ra="ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR
+fi
+```
+
+Launches Ranger and automatically changes to the directory you navigate to when exiting.
+
+## Alert alias (Bash)
+
+Send desktop notifications when commands complete:
+
+```bash ~/.bashrc
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+```
+
+**Usage:**
+
+```bash
+# Get notified when a long build completes
+npm run build; alert
+
+# Notification for system updates
+sudo apt update && sudo apt upgrade; alert
+```
+
+<Note>
+  The notification icon changes based on whether the command succeeded or failed.
+</Note>
+
+## Category reference
+
+<AccordionGroup>
+  <Accordion title="Editor (3 aliases)">
+    - `vim` → nvim
+    - `vi` → nvim
+    - `v` → nvim
+  </Accordion>
+
+  <Accordion title="Navigation (Zsh: 3, Bash: 4)">
+    **Zsh:**
+    - `ls` → eza --color=auto
+    - `ll` → ls -l
+    - `la` → ls -a
+
+    **Bash:**
+    - `ls` → ls --color=auto
+    - `ll` → ls -alF
+    - `la` → ls -A
+    - `l` → ls -CF
+  </Accordion>
+
+  <Accordion title="Terminal (2 aliases)">
+    - `c` → clear
+    - `q` → exit
+  </Accordion>
+
+  <Accordion title="Git (1 alias)">
+    - `lg` → lazygit
+  </Accordion>
+
+  <Accordion title="Utilities (4+ aliases)">
+    - `weather` → curl wttr.in
+    - `dotnet-test-pretty` → formatted test output
+    - `ra` → ranger with directory tracking
+    - `..` → cd ..
+  </Accordion>
+
+  <Accordion title="Zoxide (Bash: 4 aliases)">
+    - `cda` → zoxide add
+    - `cdq` → zoxide query
+    - `cdqi` → zoxide query -i
+    - `cdr` → zoxide remove
+  </Accordion>
+
+  <Accordion title="Search (Bash: 3 aliases)">
+    - `grep` → grep --color=auto
+    - `fgrep` → fgrep --color=auto
+    - `egrep` → egrep --color=auto
+  </Accordion>
+</AccordionGroup>
+
+## Creating custom aliases
+
+Add your own aliases to the shell configuration files:
+
+<Steps>
+  <Step title="Open your shell config">
+    ```bash
+    # For Zsh
+    nvim ~/.zshrc
+
+    # For Bash
+    nvim ~/.bashrc
+    ```
+  </Step>
+  <Step title="Add your alias">
+    ```bash
+    # Example: Create a shortcut for git status
+    alias gs="git status"
+
+    # Example: Quick access to a frequent directory
+    alias proj="cd ~/workspace/projects"
+    ```
+  </Step>
+  <Step title="Reload your shell">
+    ```bash
+    # Reload the configuration
+    source ~/.zshrc  # for Zsh
+    source ~/.bashrc # for Bash
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  For temporary aliases that you don't want to keep, simply type the alias command in your shell without adding it to the config file.
+</Tip>

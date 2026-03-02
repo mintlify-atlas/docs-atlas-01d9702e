@@ -1,0 +1,137 @@
+---
+title: Lazygit
+description: Terminal UI for Git commands with custom theme
+icon: git
+---
+
+## Overview
+
+Lazygit is a simple terminal UI for Git commands. The configuration includes custom Catppuccin-inspired theming and keybindings.
+
+## Installation
+
+### Arch Linux
+
+```bash
+yay -S lazygit
+```
+
+### Ubuntu/Debian
+
+Lazygit may need manual installation from the official releases:
+
+```bash
+# Check https://github.com/jesseduffield/lazygit for latest release
+```
+
+### Using Cargo
+
+```bash
+cargo install lazygit
+```
+
+## Configuration
+
+Lazygit configuration is stored in `.config/lazygit/` with two main files:
+
+- `config.yml` - Keybindings and behavior settings
+- `theme.yml` - Color scheme configuration
+
+## Theme customization
+
+The theme uses Catppuccin-inspired colors:
+
+```yaml theme.yml
+theme:
+  activeBorderColor:
+    - '#f38ba8'
+    - bold
+  inactiveBorderColor:
+    - '#a6adc8'
+  optionsTextColor:
+    - '#89b4fa'
+  selectedLineBgColor:
+    - '#313244'
+  cherryPickedCommitBgColor:
+    - '#45475a'
+  cherryPickedCommitFgColor:
+    - '#f38ba8'
+  unstagedChangesColor:
+    - '#f38ba8'
+  defaultFgColor:
+    - '#cdd6f4'
+  searchingActiveBorderColor:
+    - '#f9e2af'
+
+author Colors:
+  '*': '#b4befe'
+```
+
+### Color scheme
+
+<CardGroup cols={2}>
+  <Card title="Active border" icon="border-outer">
+    Pink (#f38ba8) with bold styling
+  </Card>
+  <Card title="Selection" icon="hand-pointer">
+    Dark gray background (#313244)
+  </Card>
+  <Card title="Unstaged changes" icon="file-pen">
+    Pink color (#f38ba8) for modified files
+  </Card>
+  <Card title="Search highlight" icon="magnifying-glass">
+    Yellow (#f9e2af) for active searches
+  </Card>
+</CardGroup>
+
+## Shell integration
+
+Convenient alias for quick access:
+
+```bash .zshrc
+alias lg="lazygit"
+```
+
+## Usage
+
+Launch Lazygit in any Git repository:
+
+```bash
+lazygit  # Full command
+lg       # Using alias
+```
+
+## Key features
+
+<Steps>
+  <Step title="Stage and commit">
+    Navigate files with arrow keys, press `space` to stage, `c` to commit
+  </Step>
+  <Step title="Branch management">
+    Switch to branches view with `[` and `]` to navigate tabs
+  </Step>
+  <Step title="Visual diffs">
+    View file changes with syntax highlighting and easy navigation
+  </Step>
+  <Step title="Interactive rebasing">
+    Manage commit history with visual interactive rebase
+  </Step>
+</Steps>
+
+<Tip>
+  Press `?` inside Lazygit to see all available keybindings.
+</Tip>
+
+## Integration with workflow
+
+Lazygit integrates seamlessly with the development environment:
+
+- Works inside Tmux sessions
+- Can be launched from Neovim
+- Respects Git configuration and GPG signing
+- Follows the configured Git delta diff viewer
+
+## Related tools
+
+- [Neovim](/dev/neovim) - Editor with Git integration
+- Git delta - Enhanced diff viewer (configured separately)

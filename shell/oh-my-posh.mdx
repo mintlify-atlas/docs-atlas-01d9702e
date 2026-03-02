@@ -1,0 +1,243 @@
+---
+title: Oh My Posh
+description: Minimal and elegant prompt theme using Oh My Posh with the custom Zen theme
+---
+
+## Overview
+
+Oh My Posh is a custom prompt theme engine that provides a beautiful, informative command-line interface. This configuration uses a custom "Zen" theme designed for minimalism and clarity.
+
+## Installation
+
+<Steps>
+  <Step title="Install Oh My Posh">
+    Follow the [official installation guide](https://ohmyposh.dev/docs/installation/linux) for your platform:
+
+    ```bash
+    # Linux (using curl)
+    curl -s https://ohmyposh.dev/install.sh | bash -s
+    ```
+  </Step>
+  <Step title="Configure in shell">
+    Add the initialization to your shell configuration:
+
+    <CodeGroup>
+      ```bash Zsh
+      # ~/.zshrc
+      eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/themes/zen.toml)"
+      ```
+
+      ```bash Bash
+      # ~/.bashrc
+      eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/zen.toml)"
+      ```
+    </CodeGroup>
+  </Step>
+  <Step title="Install a Nerd Font">
+    Oh My Posh requires a Nerd Font for icons. Install one from [nerdfonts.com](https://www.nerdfonts.com/):
+
+    ```bash
+    # Example: Install JetBrainsMono Nerd Font
+    oh-my-posh font install jetbrainsmono
+    ```
+
+    Then configure your terminal to use the installed font.
+  </Step>
+</Steps>
+
+## Zen theme
+
+The Zen theme is a custom minimal theme that displays essential information without clutter.
+
+### Theme features
+
+<CardGroup cols={2}>
+  <Card title="OS indicator" icon="computer">
+    Shows the current operating system with WSL detection
+  </Card>
+  <Card title="Path display" icon="folder">
+    Full path to current directory in blue
+  </Card>
+  <Card title="Git status" icon="git">
+    Branch name, working changes, and sync status
+  </Card>
+  <Card title="Execution time" icon="clock">
+    Shows command duration for long-running commands (>5s)
+  </Card>
+</CardGroup>
+
+### Theme configuration
+
+The complete Zen theme configuration:
+
+```toml ~/.config/oh-my-posh/themes/zen.toml
+console_title_template = '{{ .Shell }} in {{ .Folder }}'
+version = 3
+final_space = true
+
+[secondary_prompt]
+  template = '❯❯ '
+  foreground = 'magenta'
+  background = 'transparent'
+
+[transient_prompt]
+  template = '❯ '
+  background = 'transparent'
+  foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}magenta{{end}}']
+```
+
+### Prompt segments
+
+<Accordion title="OS segment">
+  ```toml
+  [[blocks.segments]]
+    template = '{{ if .WSL }} WSL {{ end }}{{ .Icon }} <cyan>|</> '
+    foreground = 'magenta'
+    background = 'transparent'
+    type = 'os'
+  ```
+  
+  Displays the OS icon and indicates if running in WSL.
+</Accordion>
+
+<Accordion title="Path segment">
+  ```toml
+  [[blocks.segments]]
+    template = '{{ .Path }}'
+    foreground = 'blue'
+    background = 'transparent'
+    type = 'path'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      cache_duration = 'none'
+      style = 'full'
+  ```
+  
+  Shows the full current directory path in blue.
+</Accordion>
+
+<Accordion title="Git segment">
+  ```toml
+  [[blocks.segments]]
+    template = ' {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>'
+    foreground = 'p:grey'
+    background = 'transparent'
+    type = 'git'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      branch_icon = ''
+      cache_duration = 'none'
+      commit_icon = '@'
+      fetch_status = true
+  ```
+  
+  Shows:
+  - Current branch name
+  - `*` if there are uncommitted changes
+  - `⇣` if behind remote
+  - `⇡` if ahead of remote
+</Accordion>
+
+<Accordion title="Execution time segment">
+  ```toml
+  [[blocks.segments]]
+    template = '{{ .FormattedMs }}'
+    foreground = 'yellow'
+    background = 'transparent'
+    type = 'executiontime'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      cache_duration = 'none'
+      threshold = 5000
+  ```
+  
+  Displays command execution time in yellow if it exceeds 5 seconds.
+</Accordion>
+
+### Prompt symbol
+
+The main prompt symbol changes color based on the last command's exit status:
+
+```toml
+[[blocks.segments]]
+  template = '❯'
+  background = 'transparent'
+  type = 'text'
+  style = 'plain'
+  foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}magenta{{end}}']
+```
+
+<Note>
+  The prompt symbol appears in **magenta** for successful commands and **red** for failed commands.
+</Note>
+
+## Transient prompt
+
+The transient prompt feature minimizes previous prompts to save screen space:
+
+```toml
+[transient_prompt]
+  template = '❯ '
+  background = 'transparent'
+  foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}magenta{{end}}']
+```
+
+After executing a command, the full prompt collapses to just `❯`, keeping your terminal clean and focused.
+
+## Console title
+
+The terminal window title is automatically set to show the current shell and directory:
+
+```toml
+console_title_template = '{{ .Shell }} in {{ .Folder }}'
+```
+
+Example: `zsh in ~/workspace/dotfiles`
+
+## Customization
+
+To customize the theme, edit `~/.config/oh-my-posh/themes/zen.toml`:
+
+<CodeGroup>
+  ```toml Change colors
+  # Change prompt color from magenta to blue
+  foreground = 'blue'
+  ```
+
+  ```toml Change path style
+  # Use folder name only instead of full path
+  [blocks.segments.properties]
+    style = 'folder'
+  ```
+
+  ```toml Adjust execution time threshold
+  # Show execution time for commands over 3 seconds
+  [blocks.segments.properties]
+    threshold = 3000
+  ```
+</CodeGroup>
+
+<Tip>
+  Explore more segments and customization options in the [Oh My Posh documentation](https://ohmyposh.dev/docs/configuration/overview).
+</Tip>
+
+## Visual example
+
+Here's what the Zen theme looks like in action:
+
+```
+ Arch /home/user/workspace/dotfiles main* ⇡
+❯ git status
+# ... git output ...
+
+ Arch /home/user/workspace/dotfiles main* ⇡        2.3s
+❯ npm run build
+# ... build output ...
+
+❯ _
+```
+
+The prompt provides all essential information at a glance while maintaining a clean, minimal aesthetic.

@@ -1,0 +1,306 @@
+---
+title: Tmux
+description: Terminal multiplexer for managing multiple terminal sessions
+icon: grid
+---
+
+## Overview
+
+Tmux is a terminal multiplexer that allows you to manage multiple terminal sessions, windows, and panes within a single terminal window. This configuration includes vi-mode keybindings, custom plugins, and a TokyoNight theme.
+
+## Configuration
+
+The main configuration is located at `.config/tmux/tmux.conf`.
+
+## Basic settings
+
+```bash
+set-option -sa terminal-overrides ",xterm*:Tc"
+set -sg escape-time 0
+set -g mouse on
+```
+
+<CardGroup cols={2}>
+  <Card title="True color" icon="palette">
+    Terminal override enables 24-bit true color support
+  </Card>
+  <Card title="Escape time" icon="clock">
+    Zero escape time for instant key response
+  </Card>
+  <Card title="Mouse support" icon="computer-mouse">
+    Mouse mode enabled for clicking and scrolling
+  </Card>
+  <Card title="Vi mode" icon="keyboard">
+    Vi-style keybindings for copy mode
+  </Card>
+</CardGroup>
+
+## Prefix key
+
+The prefix is changed from the default `Ctrl+b` to `Ctrl+a`:
+
+```bash
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
+```
+
+<Info>
+  `Ctrl+a` is easier to reach and commonly used in screen and other terminal multiplexers.
+</Info>
+
+## Window and pane indexing
+
+Windows and panes start at 1 instead of 0 for easier keyboard access:
+
+```bash
+# Start windows and panes at 1, not 0
+set -g base-index 1
+set -g pane-base-index 1
+set-window-option -g pane-base-index 1
+set-option -g renumber-windows on
+```
+
+<Tip>
+  Windows are automatically renumbered when one is closed, keeping the sequence continuous.
+</Tip>
+
+## Vi mode keybindings
+
+Copy mode uses vi-style keybindings:
+
+```bash
+set-window-option -g mode-keys vi
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+```
+
+<AccordionGroup>
+  <Accordion title="Visual selection">
+    Press `v` in copy mode to begin selection, just like in Vim:
+    
+    ```bash
+    bind -T copy-mode-vi v send-keys -X begin-selection
+    ```
+  </Accordion>
+  
+  <Accordion title="Copy to clipboard">
+    Press `y` to copy the selection to the system clipboard using xclip:
+    
+    ```bash
+    bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Status bar
+
+The status bar is positioned at the top:
+
+```bash
+# Set the bar to the top
+set -g status-position top
+```
+
+## Image passthrough
+
+Image passthrough is enabled for displaying images in the terminal:
+
+```bash
+# Allow Image passthrough
+set -gq allow-passthrough on
+set -g visual-activity off
+```
+
+## Plugins
+
+Tmux Plugin Manager (TPM) is used to manage plugins:
+
+```bash
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin "j4ytr1n1ty/tokyo-night-tmux"
+set -g @plugin 'tmux-plugins/tmux-yank'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+```
+
+<CardGroup cols={2}>
+  <Card title="tpm" icon="plug">
+    Tmux Plugin Manager for easy plugin installation
+  </Card>
+  <Card title="vim-tmux-navigator" icon="arrows-up-down-left-right">
+    Seamless navigation between vim and tmux panes
+  </Card>
+  <Card title="tokyo-night-tmux" icon="moon">
+    TokyoNight theme for tmux status bar
+  </Card>
+  <Card title="tmux-yank" icon="clipboard">
+    Enhanced clipboard integration
+  </Card>
+  <Card title="tmux-resurrect" icon="rotate-right">
+    Save and restore tmux sessions
+  </Card>
+  <Card title="tmux-sensible" icon="gear">
+    Sensible default settings for tmux
+  </Card>
+</CardGroup>
+
+## Tmux Resurrect configuration
+
+Tmux Resurrect is configured to save Neovim sessions and pane contents:
+
+```bash
+set -g @resurrect-strategy-nvim 'session'
+set -g @resurrect-capture-pane-contents 'on'
+```
+
+<Info>
+  This allows you to save and restore your entire tmux environment, including running programs and pane layouts.
+</Info>
+
+## TokyoNight theme settings
+
+```bash
+set -g @tokyo-night-tmux_theme dark    # dark | storm | day | default to 'night'
+set -g @tokyo-night-tmux_show_path 0
+set -g @tokyo-night-tmux_path_format relative # 'relative' or 'full'
+set -g @tokyo-night-tmux_transparent 0  # 1 or 0
+set -g @tokyo-night-tmux_show_music 0
+```
+
+## Custom keybindings
+
+### Pane navigation
+
+Vim-style pane navigation:
+
+```bash
+# vim-like pane switching
+bind -r ^ last-window
+bind -r k select-pane -U
+bind -r j select-pane -D
+bind -r h select-pane -L
+bind -r l select-pane -R
+```
+
+<AccordionGroup>
+  <Accordion title="Navigation keys">
+    - `prefix + h`: Move to left pane
+    - `prefix + j`: Move to pane below
+    - `prefix + k`: Move to pane above
+    - `prefix + l`: Move to right pane
+    - `prefix + ^`: Jump to last window
+  </Accordion>
+</AccordionGroup>
+
+### Split windows
+
+Split windows open in the current pane's directory:
+
+```bash
+bind '"' split-window -v -c "#{pane_current_path}"
+bind % split-window -h -c "#{pane_current_path}"
+bind c new-window -c "#{pane_current_path}"
+```
+
+<Tip>
+  New windows and panes automatically inherit the current working directory, saving you from having to navigate to the same location.
+</Tip>
+
+## Tmux cheat sheet script
+
+A custom keybinding opens an interactive cheat sheet using cht.sh:
+
+```bash
+# Custom Bindings
+bind-key -r C run-shell "tmux neww ~/scripts/tmux/tmux-ch.sh"
+```
+
+### tmux-ch.sh script
+
+The script (`scripts/tmux/tmux-ch.sh`) provides quick access to programming language and command cheat sheets:
+
+```bash
+#!/usr/bin/env bash
+selected=`cat ~/.tmux/.tmux-cht-languages ~/.tmux/.tmux-cht-command | fzf`
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+read -p "Enter Query: " query
+
+if grep -qs "$selected" ~/.tmux-cht-languages; then
+    query=`echo $query | tr ' ' '+'`
+    tmux neww bash -c "echo \"curl cht.sh/$selected/$query/\" & curl cht.sh/$selected/$query & while [ : ]; do sleep 1; done"
+else
+    tmux neww bash -c "curl -s cht.sh/$selected~$query | less -R"
+fi
+```
+
+<Info>
+  Press `prefix + C` to open an fzf menu of languages and commands. Select one, enter your query, and instantly get documentation from cht.sh.
+</Info>
+
+## Plugin installation
+
+The TPM plugin manager is loaded at the end:
+
+```bash
+run '$HOME/.tmux/plugins/tpm/tpm'
+```
+
+## Installation
+
+1. Install tmux and dependencies:
+
+```bash
+# Install tmux
+sudo apt install tmux  # Debian/Ubuntu
+brew install tmux      # macOS
+
+# Install TPM
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+```
+
+2. Symlink the configuration:
+
+```bash
+stow -t ~ tmux
+```
+
+3. Install plugins:
+
+- Start tmux
+- Press `prefix + I` (capital i) to install plugins
+
+<Note>
+  After installation, reload the configuration with `prefix + r` or restart tmux.
+</Note>
+
+## Quick reference
+
+<AccordionGroup>
+  <Accordion title="Essential keybindings">
+    - `Ctrl+a`: Prefix key
+    - `prefix + c`: Create new window
+    - `prefix + "`: Split horizontally
+    - `prefix + %`: Split vertically
+    - `prefix + h/j/k/l`: Navigate panes (vim-style)
+    - `prefix + C`: Open cheat sheet
+    - `prefix + [`: Enter copy mode
+    - `prefix + I`: Install plugins
+  </Accordion>
+  
+  <Accordion title="Copy mode">
+    - `prefix + [`: Enter copy mode
+    - `v`: Begin selection
+    - `y`: Copy selection to clipboard
+    - `q`: Exit copy mode
+  </Accordion>
+  
+  <Accordion title="Session management">
+    - `prefix + Ctrl+s`: Save session (tmux-resurrect)
+    - `prefix + Ctrl+r`: Restore session (tmux-resurrect)
+  </Accordion>
+</AccordionGroup>

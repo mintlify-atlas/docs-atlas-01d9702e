@@ -1,0 +1,117 @@
+---
+title: Neovim
+description: Modern text editor with LazyVim configuration
+icon: code
+---
+
+## Overview
+
+Neovim is configured with LazyVim, a modern and efficient Neovim distribution that provides a complete IDE experience out of the box. The configuration is stored as a Git submodule at `.config/nvim/`.
+
+## Installation
+
+### Arch Linux
+
+```bash
+yay -S neovim
+```
+
+### Ubuntu/Debian
+
+```bash
+sudo apt install neovim
+```
+
+For the latest version, you may need to download from the official releases or use a PPA.
+
+## Configuration
+
+The Neovim configuration uses LazyVim, which provides:
+
+- Modern plugin management with lazy.nvim
+- LSP support with automatic configuration
+- Syntax highlighting with Tree-sitter
+- File explorer and fuzzy finding
+- Git integration
+- Autocompletion and snippets
+
+### LazyVim setup
+
+The configuration is managed as a Git submodule:
+
+```bash
+# The nvim config is located at:
+~/.config/nvim/
+```
+
+LazyVim will automatically install plugins on first launch. Press `Space` to see the leader key menu with all available commands.
+
+## Editor aliases
+
+Convenient aliases are configured for quick access:
+
+<CodeGroup>
+
+```bash Zsh aliases
+alias vim="nvim"
+alias vi="nvim"
+alias v="nvim"
+```
+
+```bash Bash alias
+alias vim="nvim"
+```
+
+</CodeGroup>
+
+## Environment variables
+
+Neovim is set as the default editor:
+
+```bash
+export EDITOR="nvim"
+```
+
+## PATH configuration
+
+If using a custom Neovim installation:
+
+```bash .zshrc
+export PATH="/opt/nvim/:$PATH"
+```
+
+## Usage
+
+Launch Neovim with any of the configured aliases:
+
+```bash
+v              # Quick launch
+vim myfile.txt # Edit a file
+nvim .         # Open current directory
+```
+
+<Tip>
+  Press `Space` in normal mode to access the LazyVim command palette with all available features.
+</Tip>
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="LSP support" icon="brackets-curly">
+    Automatic language server configuration for modern development
+  </Card>
+  <Card title="Tree-sitter" icon="tree">
+    Advanced syntax highlighting and code understanding
+  </Card>
+  <Card title="File navigation" icon="folder-tree">
+    Fuzzy finding and file explorer integration
+  </Card>
+  <Card title="Git integration" icon="git">
+    Built-in Git commands and visual diff tools
+  </Card>
+</CardGroup>
+
+## Related tools
+
+- [Lazygit](/dev/lazygit) - Git interface that integrates with Neovim
+- [Ranger](/dev/ranger) - File manager with Neovim integration

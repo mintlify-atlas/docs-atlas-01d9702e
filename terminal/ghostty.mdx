@@ -1,0 +1,89 @@
+---
+title: Ghostty
+description: Fast, GPU-accelerated terminal emulator with native OS integration
+icon: ghost
+---
+
+## Overview
+
+Ghostty is a modern, GPU-accelerated terminal emulator that provides excellent performance and native OS integration. The configuration uses the TokyoNight Night theme with the Monocraft font for a retro yet modern aesthetic.
+
+## Configuration
+
+The Ghostty configuration is minimal and focused, located at `.config/ghostty/config`:
+
+```bash
+theme = TokyoNight Night
+# background-opacity = 0.95
+window-decoration = none
+font-family = Monocraft
+```
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Theme" icon="palette">
+    TokyoNight Night provides a dark, easy-on-the-eyes color scheme
+  </Card>
+  <Card title="Font" icon="font">
+    Monocraft gives a unique pixel-art aesthetic to the terminal
+  </Card>
+  <Card title="Window" icon="window-maximize">
+    No window decorations for a clean, distraction-free interface
+  </Card>
+  <Card title="Performance" icon="gauge-high">
+    GPU acceleration ensures smooth rendering
+  </Card>
+</CardGroup>
+
+## Theme
+
+<Info>
+  The TokyoNight Night theme provides a carefully crafted dark color scheme designed to reduce eye strain during extended coding sessions.
+</Info>
+
+The theme is applied with a single line:
+
+```bash
+theme = TokyoNight Night
+```
+
+## Font configuration
+
+Monocraft is a monospaced pixel-art font that brings a retro gaming aesthetic to your terminal:
+
+```bash
+font-family = Monocraft
+```
+
+## Window settings
+
+For a clean, minimal appearance, window decorations are disabled:
+
+```bash
+window-decoration = none
+```
+
+<Tip>
+  The background opacity is commented out by default, but can be enabled by uncommenting the line and adjusting the value between 0 and 1.
+</Tip>
+
+## Optional transparency
+
+To enable background transparency, uncomment and adjust the opacity value:
+
+```bash
+background-opacity = 0.95
+```
+
+## Installation
+
+Install Ghostty and the Monocraft font, then symlink the configuration:
+
+```bash
+stow -t ~ ghostty
+```
+
+<Note>
+  Make sure to install the Monocraft font system-wide for it to be available to Ghostty.
+</Note>

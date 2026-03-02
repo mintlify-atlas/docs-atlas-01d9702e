@@ -1,0 +1,505 @@
+---
+title: Customization
+description: Guide to customizing and personalizing your dotfiles configuration
+---
+
+This guide shows you how to customize various aspects of the dotfiles to match your preferences.
+
+## Color schemes and themes
+
+### Hyprland colors
+
+Edit border colors and appearance in `~/.config/hypr/hyprland.conf:66`:
+
+```conf
+general {
+    # Active window border (gradient)
+    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+    
+    # Inactive window border
+    col.inactive_border = rgba(595959aa)
+    
+    # Gaps between windows
+    gaps_in = 5
+    gaps_out = 20
+    
+    # Border thickness
+    border_size = 2
+}
+```
+
+<Tip>
+Color format is `rgba(RRGGBBaa)` where:
+- `RRGGBB` is the hex color code
+- `aa` is the alpha (transparency) value in hex (00-ff)
+
+For gradients, specify two colors and an angle.
+</Tip>
+
+### Terminal themes
+
+**Ghostty** (`~/.config/ghostty/config:1`):
+
+```conf
+theme = TokyoNight Night
+# Other popular themes:
+# theme = Dracula
+# theme = Nord
+# theme = Catppuccin
+```
+
+**Kitty** (`~/.config/kitty/kitty.conf:26`):
+
+```conf
+include tokyodark.conf
+# Available theme files:
+# include tokyonight.conf
+# Or create your own theme file
+```
+
+Kitty includes theme files in `~/.config/kitty/tokyonight.conf` and `~/.config/kitty/tokyodark.conf`. Create custom theme files following the same format.
+
+### Tmux theme
+
+The Tokyo Night tmux theme can be customized in `~/.config/tmux/tmux.conf:36`:
+
+```conf
+set -g @tokyo-night-tmux_theme dark  # Options: dark | storm | day
+set -g @tokyo-night-tmux_transparent 0  # 1 for transparency, 0 for solid
+```
+
+### System-wide theme with Pywal
+
+The dotfiles include Pywal templates in `~/.config/wal/templates/` for:
+- Hyprland (`pywal-hypr.conf`)
+- Qt5 (`qt5ct.conf`) 
+- Qt6 (`qt6ct.conf`)
+
+To generate colors from a wallpaper:
+
+```bash
+wal -i ~/path/to/wallpaper.png
+```
+
+This will automatically update color schemes across applications.
+
+## Fonts
+
+### Terminal fonts
+
+**Ghostty** (`~/.config/ghostty/config:4`):
+
+```conf
+font-family = Monocraft
+# Alternative options:
+# font-family = JetBrainsMono Nerd Font
+# font-family = FiraCode Nerd Font
+# font-family = Hack Nerd Font
+```
+
+**Kitty** (`~/.config/kitty/kitty.conf:2`):
+
+```conf
+font_family  JetBrains Mono Nerd Font
+font_size    12
+
+# Font variations
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+```
+
+<Note>
+**Installing additional fonts:**
+
+```bash
+# Arch Linux
+yay -S ttf-firacode-nerd ttf-hack-nerd
+
+# Manual installation
+mkdir -p ~/.local/share/fonts
+cp *.ttf ~/.local/share/fonts/
+fc-cache -fv
+```
+
+Verify installation:
+```bash
+fc-list | grep -i "font name"
+```
+</Note>
+
+### System font size
+
+Adjust terminal font size for better readability:
+
+```conf
+# Ghostty: Add to config
+font-size = 14
+
+# Kitty: Already in config
+font_size 12
+```
+
+## Window manager customization
+
+### Animations
+
+Customize Hyprland animations in `~/.config/hypr/hyprland.conf:111`:
+
+```conf
+animations {
+    enabled = yes  # Set to 'no' to disable all animations
+    
+    # Adjust animation speed (higher = slower)
+    animation = windows, 1, 4.79, easeOutQuint
+    animation = fade, 1, 3.03, quick
+    
+    # Disable specific animations
+    animation = workspaces, 0  # Disables workspace animations
+}
+```
+
+### Window decorations
+
+```conf
+decoration {
+    rounding = 10           # Corner radius (0 = square corners)
+    
+    active_opacity = 1.0    # Focused window opacity
+    inactive_opacity = 1.0  # Unfocused window opacity
+    
+    blur {
+        enabled = true
+        size = 3            # Blur radius
+        passes = 1          # Blur quality (more passes = better quality)
+    }
+    
+    shadow {
+        enabled = true
+        range = 4
+        color = rgba(1a1a1aee)
+    }
+}
+```
+
+### Layouts
+
+Switch between tiling layouts in `~/.config/hypr/hyprland.conf:82`:
+
+```conf
+general {
+    layout = dwindle  # Options: dwindle | master
+}
+
+# Configure dwindle layout
+dwindle {
+    pseudotile = true
+    preserve_split = true
+}
+
+# Or configure master layout
+master {
+    new_status = master  # Options: master | slave
+}
+```
+
+## Keyboard customization
+
+### Changing Kanata mappings
+
+Edit `~/.config/kanata/config.kbd` to customize keyboard remapping:
+
+```lisp
+;; Current: Caps Lock = Backspace on tap, Ctrl on hold
+(defalias
+  bspcctrl (tap-hold 100 100 bspc lctrl)
+)
+
+;; Example: Change to Escape on tap, Ctrl on hold
+(defalias
+  escctrl (tap-hold 100 100 esc lctrl)
+)
+
+(deflayer base
+  @escctrl  ;; Apply the new mapping
+)
+```
+
+<Accordion title="Advanced Kanata: Add more key remappings">
+To remap additional keys, expand the configuration:
+
+```lisp
+(defsrc
+  caps  ;; Add more keys here
+  tab
+)
+
+(defalias
+  escctrl (tap-hold 100 100 esc lctrl)
+  tabsuper (tap-hold 100 100 tab lmet)  ;; Tab = Tab on tap, Super on hold
+)
+
+(deflayer base
+  @escctrl
+  @tabsuper
+)
+```
+
+After editing, restart Kanata:
+```bash
+systemctl --user restart kanata
+```
+</Accordion>
+
+### Hyprland keybindings
+
+Modify or add keybindings in `~/.config/hypr/hyprland.conf:204`:
+
+```conf
+# Change the main modifier
+$mainMod = SUPER  # Options: SUPER, ALT, CTRL
+
+# Add custom keybindings
+bind = $mainMod, T, exec, thunar              # File manager
+bind = $mainMod SHIFT, R, exec, hyprctl reload # Reload config
+bind = $mainMod, N, exec, neovide             # GUI Neovim
+
+# Change existing bindings
+bind = $mainMod, Q, killactive,  # Kill window (default)
+bind = $mainMod, X, killactive,  # Alternative: X to close
+```
+
+### Tmux keybindings
+
+Customize Tmux bindings in `~/.config/tmux/tmux.conf`:
+
+```conf
+# Change prefix key (default: C-a)
+set-option -g prefix C-b  # Change back to Ctrl+b
+# Or use a different key:
+set-option -g prefix C-Space
+
+# Add custom bindings
+bind r source-file ~/.config/tmux/tmux.conf  # Reload config with prefix+r
+bind C-l send-keys 'C-l'  # Clear screen with prefix+Ctrl+l
+```
+
+## Application launcher
+
+### Wofi customization
+
+Edit `~/.config/wofi/config` to customize the application launcher:
+
+```conf
+width=600
+height=400
+location=center
+show=drun
+prompt=Search...
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitive=true
+allow_images=true
+image_size=40
+```
+
+Change the launcher in Hyprland config:
+```conf
+$menu = wofi --show drun
+# Alternatives:
+# $menu = rofi -show drun
+# $menu = fuzzel
+```
+
+## Default applications
+
+### Hyprland defaults
+
+Change default applications in `~/.config/hypr/hyprland.conf:28`:
+
+```conf
+$terminal = ghostty      # Options: ghostty, kitty, alacritty
+$fileManager = dolphin   # Options: dolphin, thunar, ranger
+$menu = wofi --show drun # Options: wofi, rofi, fuzzel
+$browser = brave         # Options: brave, firefox, chromium
+```
+
+### System defaults
+
+Set system-wide default applications:
+
+```bash
+# Set default browser
+xdg-settings set default-web-browser brave-browser.desktop
+
+# Set default file manager
+xdg-mime default dolphin.desktop inode/directory
+
+# Set default text editor
+export EDITOR=nvim
+export VISUAL=nvim
+```
+
+Add to `~/.zshrc` to persist these settings.
+
+## Adding plugins and tools
+
+### Tmux plugins
+
+Add plugins in `~/.config/tmux/tmux.conf:26`:
+
+```conf
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'j4ytr1n1ty/tokyo-night-tmux'
+set -g @plugin 'tmux-plugins/tmux-yank'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+# Add new plugins:
+set -g @plugin 'tmux-plugins/tmux-continuum'  # Auto-save sessions
+set -g @plugin 'tmux-plugins/tmux-cpu'        # CPU/RAM usage
+```
+
+Install new plugins: Press `Ctrl+a` then `I`
+
+### Zsh plugins
+
+The dotfiles use Zinit for Zsh plugin management. Edit `~/.zshrc`:
+
+```bash
+# Add new plugins
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+
+# Add your custom plugins:
+zinit light agkozak/zsh-z              # Better directory jumping
+zinit light hlissner/zsh-autopair      # Auto-close brackets
+```
+
+### Neovim plugins (LazyVim)
+
+Add plugins in `~/.config/nvim/lua/plugins/`:
+
+```lua
+-- Create a new file: ~/.config/nvim/lua/plugins/custom.lua
+return {
+  {
+    "folke/trouble.nvim",
+    opts = {},
+  },
+  {
+    "github/copilot.vim",
+  },
+}
+```
+
+Restart Neovim and run `:Lazy sync` to install.
+
+## Status bar customization
+
+### Waybar
+
+Edit `~/.config/waybar/Waybar-3.0/config` to customize modules:
+
+```json
+{
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["cpu", "memory", "battery", "network", "pulseaudio"]
+}
+```
+
+Add new modules, reorder existing ones, or remove unwanted modules.
+
+### Switching status bars
+
+Toggle between AGS and Waybar in `~/.config/hypr/hyprland.conf:43`:
+
+```conf
+# Use AGS (default)
+exec-once = agsv1 & hyprpaper
+
+# Or use Waybar
+exec-once = waybar & hyprpaper
+```
+
+## Environment variables
+
+Customize environment variables in `~/.config/hypr/hyprland.conf:50` or `~/.zshrc`:
+
+```conf
+# Hyprland environment variables
+env = XCURSOR_SIZE,24
+env = EDITOR,nvim
+env = BROWSER,brave
+env = TERMINAL,ghostty
+```
+
+```bash
+# Zsh environment variables (add to ~/.zshrc)
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+export EDITOR="nvim"
+export VISUAL="nvim"
+export BROWSER="brave"
+```
+
+## Wallpaper
+
+Change wallpaper using hyprpaper:
+
+1. Edit or create `~/.config/hypr/hyprpaper.conf`:
+   ```conf
+   preload = ~/Pictures/wallpaper.png
+   wallpaper = ,~/Pictures/wallpaper.png
+   ```
+
+2. Reload hyprpaper:
+   ```bash
+   killall hyprpaper
+   hyprpaper &
+   ```
+
+Or use a different wallpaper manager:
+```bash
+yay -S swaybg
+exec-once = swaybg -i ~/Pictures/wallpaper.png
+```
+
+## Creating your own configurations
+
+The dotfiles are designed to be modular:
+
+1. **Fork the repository** to create your own version
+2. **Create feature branches** for experimental changes
+3. **Use git** to track your customizations:
+   ```bash
+   cd ~/dotfiles
+   git checkout -b my-customizations
+   # Make changes
+   git add .
+   git commit -m "Add my custom keybindings"
+   ```
+4. **Keep upstream changes** by adding the original repo as a remote:
+   ```bash
+   git remote add upstream https://github.com/j4ytr1n1ty/dotfiles.git
+   git fetch upstream
+   git merge upstream/main
+   ```
+
+<Tip>
+**Best practice**: Keep your customizations in separate files that are sourced by the main config files. This makes it easier to merge upstream updates.
+
+Example for Hyprland:
+```conf
+# At the end of ~/.config/hypr/hyprland.conf
+source = ~/.config/hypr/custom.conf
+```
+
+Then put your changes in `~/.config/hypr/custom.conf`.
+</Tip>

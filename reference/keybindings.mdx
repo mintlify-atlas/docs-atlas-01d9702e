@@ -1,0 +1,193 @@
+---
+title: Keybindings
+description: Complete reference for keyboard shortcuts and keybindings
+---
+
+This page provides a comprehensive reference for all keyboard shortcuts across the dotfiles configuration.
+
+## Hyprland
+
+Hyprland uses `SUPER` (Windows key) as the main modifier.
+
+### Window management
+
+| Keybinding | Action |
+|------------|--------|
+| `SUPER + Q` | Kill active window |
+| `SUPER + V` | Toggle floating mode |
+| `SUPER + F` | Toggle fullscreen |
+| `SUPER + P` | Toggle pseudotile (dwindle) |
+| `SUPER + J` | Toggle split direction (dwindle) |
+| `SUPER + M` | Exit Hyprland |
+
+### Focus navigation
+
+| Keybinding | Action |
+|------------|--------|
+| `SUPER + ←` | Move focus left |
+| `SUPER + →` | Move focus right |
+| `SUPER + ↑` | Move focus up |
+| `SUPER + ↓` | Move focus down |
+
+### Applications
+
+| Keybinding | Action |
+|------------|--------|
+| `SUPER + RETURN` | Open terminal (Ghostty) |
+| `SUPER + E` | Open file manager (Dolphin) |
+| `SUPER + R` | Open application launcher (Wofi) |
+| `SUPER + B` | Open browser (Brave) |
+| `SUPER + L` | Lock screen (Swaylock) |
+
+### Workspaces
+
+| Keybinding | Action |
+|------------|--------|
+| `SUPER + 1-9,0` | Switch to workspace 1-10 |
+| `SUPER + SHIFT + 1-9,0` | Move window to workspace 1-10 |
+| `SUPER + S` | Toggle special workspace (scratchpad) |
+| `SUPER + SHIFT + S` | Move window to special workspace |
+| `SUPER + Mouse wheel` | Scroll through workspaces |
+
+### Mouse bindings
+
+| Keybinding | Action |
+|------------|--------|
+| `SUPER + Left click drag` | Move window |
+| `SUPER + Right click drag` | Resize window |
+
+### Media controls
+
+| Keybinding | Action |
+|------------|--------|
+| `XF86AudioRaiseVolume` | Increase volume by 5% |
+| `XF86AudioLowerVolume` | Decrease volume by 5% |
+| `XF86AudioMute` | Toggle audio mute |
+| `XF86AudioMicMute` | Toggle microphone mute |
+| `XF86MonBrightnessUp` | Increase brightness by 10% |
+| `XF86MonBrightnessDown` | Decrease brightness by 10% |
+| `XF86AudioNext` | Next track |
+| `XF86AudioPrev` | Previous track |
+| `XF86AudioPlay/Pause` | Play/pause media |
+
+### Gestures
+
+| Gesture | Action |
+|---------|--------|
+| 3-finger swipe | Switch workspaces |
+
+## Tmux
+
+Tmux uses `C-a` (Ctrl+a) as the prefix key.
+
+### Basic commands
+
+| Keybinding | Action |
+|------------|--------|
+| `C-a` | Prefix key (must press before other commands) |
+| `C-a I` | Install tmux plugins (TPM) |
+| `C-a ?` | Show all keybindings |
+
+### Pane management
+
+| Keybinding | Action |
+|------------|--------|
+| `C-a "` | Split pane horizontally (opens in current directory) |
+| `C-a %` | Split pane vertically (opens in current directory) |
+| `C-a h` | Select pane to the left |
+| `C-a j` | Select pane below |
+| `C-a k` | Select pane above |
+| `C-a l` | Select pane to the right |
+
+### Window management
+
+| Keybinding | Action |
+|------------|--------|
+| `C-a c` | Create new window (opens in current directory) |
+| `C-a ^` | Switch to last window |
+| `C-a 0-9` | Switch to window number |
+
+### Copy mode (Vi mode)
+
+Tmux is configured with vi-mode keybindings for copy mode.
+
+| Keybinding | Action |
+|------------|--------|
+| `C-a [` | Enter copy mode |
+| `v` | Begin selection (in copy mode) |
+| `y` | Copy selection to clipboard (in copy mode) |
+| `q` | Exit copy mode |
+
+### Custom bindings
+
+| Keybinding | Action |
+|------------|--------|
+| `C-a C` | Open tmux session switcher script |
+
+### Mouse support
+
+Mouse support is enabled, allowing you to:
+- Click to select panes
+- Drag to resize panes
+- Scroll to navigate history
+
+## Kanata (Keyboard remapping)
+
+Kanata provides system-wide keyboard remapping with tap-hold behavior.
+
+### Remapped keys
+
+| Key | Tap | Hold |
+|-----|-----|------|
+| `Caps Lock` | `Backspace` | `Left Ctrl` |
+
+<Note>
+The Caps Lock key has dual functionality:
+- **Tap quickly**: Acts as Backspace
+- **Hold down**: Acts as Left Ctrl modifier
+
+This provides ergonomic access to both frequently used keys without moving your hands from the home row.
+</Note>
+
+## Terminal (Kitty)
+
+When using Kitty terminal (Ghostty uses similar bindings).
+
+### Window/Tab management
+
+| Keybinding | Action |
+|------------|--------|
+| `Ctrl+Shift+Enter` | New window in current directory |
+| `Cmd+Enter` | New window in current directory (macOS) |
+| `Ctrl+Shift+T` | New tab in current directory |
+| `Cmd+T` | New tab in current directory (macOS) |
+
+## Neovim
+
+This dotfiles configuration uses LazyVim. For complete Neovim keybindings, refer to the [LazyVim keybindings documentation](https://www.lazyvim.org/keymaps).
+
+### Common LazyVim bindings
+
+| Keybinding | Action |
+|------------|--------|
+| `<leader>` | Space key (leader key) |
+| `<leader>ff` | Find files |
+| `<leader>fg` | Live grep |
+| `<leader>e` | Toggle file explorer |
+| `<leader>gg` | Open LazyGit |
+
+## Ranger (File Manager)
+
+Ranger uses vi-style keybindings:
+
+| Keybinding | Action |
+|------------|--------|
+| `h` | Go to parent directory |
+| `j` | Move down |
+| `k` | Move up |
+| `l` | Open file/directory |
+| `q` | Quit |
+| `yy` | Copy |
+| `dd` | Cut |
+| `pp` | Paste |
+| `zh` | Toggle hidden files |

@@ -1,0 +1,433 @@
+---
+title: Mako
+description: Mako notification daemon configuration for Wayland
+---
+
+Mako is a lightweight notification daemon for Wayland compositors, providing desktop notifications with customizable appearance and behavior.
+
+## Overview
+
+Mako is configured to run automatically when Hyprland starts, handling all desktop notifications from applications and system events.
+
+## Autostart configuration
+
+Mako is launched automatically in the Hyprland configuration:
+
+```conf .config/hypr/hyprland.conf
+exec-once = mako
+```
+
+<Info>
+  Mako starts automatically with Hyprland and runs in the background to handle all notifications.
+</Info>
+
+## Default configuration
+
+If no configuration file exists, Mako uses sensible defaults. You can create a custom configuration at `~/.config/mako/config`.
+
+## Basic configuration example
+
+```conf ~/.config/mako/config
+# Appearance
+font=JetBrainsMono Nerd Font 12
+background-color=#1e1e2e
+text-color=#cdd6f4
+border-color=#89b4fa
+border-size=2
+border-radius=10
+
+# Position and size
+width=400
+height=150
+margin=10
+padding=15
+
+# Behavior
+default-timeout=5000
+ignore-timeout=0
+
+# Icons
+icons=1
+max-icon-size=64
+icon-path=/usr/share/icons/Papirus-Dark
+
+# Grouping
+group-by=app-name
+
+# Urgency levels
+[urgency=low]
+border-color=#7f849c
+
+[urgency=normal]
+border-color=#89b4fa
+
+[urgency=critical]
+border-color=#f38ba8
+default-timeout=0
+```
+
+## Configuration options
+
+<AccordionGroup>
+  <Accordion title="Appearance settings">
+    - `font`: Font family and size for notification text
+    - `background-color`: Notification background color
+    - `text-color`: Text color
+    - `border-color`: Border color around notifications
+    - `border-size`: Border thickness in pixels
+    - `border-radius`: Corner radius for rounded corners
+  </Accordion>
+  
+  <Accordion title="Position and dimensions">
+    - `width`: Maximum width of notifications
+    - `height`: Maximum height of notifications
+    - `margin`: Margin between notifications and screen edge
+    - `padding`: Internal padding within notifications
+    - `anchor`: Screen position (top-right, top-left, bottom-right, bottom-left, top-center, bottom-center, center)
+  </Accordion>
+  
+  <Accordion title="Behavior">
+    - `default-timeout`: Time in milliseconds before auto-dismissal (0 = never)
+    - `ignore-timeout`: Ignore application-specified timeout
+    - `max-visible`: Maximum number of visible notifications
+    - `sort`: Sorting method (+time, -time, +priority, -priority)
+  </Accordion>
+  
+  <Accordion title="Icons">
+    - `icons`: Enable/disable icons (1/0)
+    - `max-icon-size`: Maximum icon size in pixels
+    - `icon-path`: Path to icon theme directory
+  </Accordion>
+</AccordionGroup>
+
+## Position examples
+
+### Top-right (default)
+
+```conf
+anchor=top-right
+margin=10
+```
+
+### Bottom-center
+
+```conf
+anchor=bottom-center
+margin=20
+```
+
+### Top-left
+
+```conf
+anchor=top-left
+margin=10,10,0,0
+```
+
+## Urgency levels
+
+Customize appearance based on notification urgency:
+
+```conf
+[urgency=low]
+border-color=#6c7086
+default-timeout=3000
+
+[urgency=normal]
+border-color=#89b4fa
+default-timeout=5000
+
+[urgency=critical]
+border-color=#f38ba8
+text-color=#f38ba8
+default-timeout=0
+ignore-timeout=1
+```
+
+<Warning>
+  Critical notifications should have `default-timeout=0` to prevent automatic dismissal.
+</Warning>
+
+## Per-app configuration
+
+Customize notifications for specific applications:
+
+```conf
+[app-name="Spotify"]
+border-color=#1db954
+default-timeout=3000
+
+[app-name="Discord"]
+border-color=#5865f2
+group-by=app-name
+
+[app-name="Firefox"]
+default-timeout=10000
+```
+
+## Theming with color schemes
+
+<Tabs>
+  <Tab title="Tokyo Night">
+    ```conf
+    background-color=#1a1b26
+    text-color=#c0caf5
+    border-color=#7aa2f7
+    
+    [urgency=low]
+    border-color=#565f89
+    
+    [urgency=critical]
+    border-color=#f7768e
+    ```
+  </Tab>
+  
+  <Tab title="Catppuccin Mocha">
+    ```conf
+    background-color=#1e1e2e
+    text-color=#cdd6f4
+    border-color=#89b4fa
+    
+    [urgency=low]
+    border-color=#6c7086
+    
+    [urgency=critical]
+    border-color=#f38ba8
+    ```
+  </Tab>
+  
+  <Tab title="Nord">
+    ```conf
+    background-color=#2e3440
+    text-color=#eceff4
+    border-color=#88c0d0
+    
+    [urgency=low]
+    border-color=#4c566a
+    
+    [urgency=critical]
+    border-color=#bf616a
+    ```
+  </Tab>
+  
+  <Tab title="Gruvbox">
+    ```conf
+    background-color=#282828
+    text-color=#ebdbb2
+    border-color=#83a598
+    
+    [urgency=low]
+    border-color=#504945
+    
+    [urgency=critical]
+    border-color=#fb4934
+    ```
+  </Tab>
+</Tabs>
+
+## Advanced features
+
+### Notification grouping
+
+```conf
+group-by=app-name
+max-visible=5
+```
+
+Groups notifications from the same application together.
+
+### Progress bars
+
+Mako automatically displays progress bars for notifications that include progress information:
+
+```conf
+progress-color=over #89b4fa
+```
+
+### Actions support
+
+Mako supports notification actions (buttons):
+
+```conf
+actions=1
+```
+
+## Controlling Mako
+
+### Command line operations
+
+```bash
+# Reload configuration
+makoctl reload
+
+# Dismiss all notifications
+makoctl dismiss --all
+
+# Dismiss last notification
+makoctl dismiss
+
+# Restore last dismissed notification
+makoctl restore
+
+# Toggle do-not-disturb mode
+makoctl mode -t dnd
+
+# Check Mako status
+makoctl list
+```
+
+<Tip>
+  Add keybindings in Hyprland to control Mako:
+  ```conf
+  bind = $mainMod, N, exec, makoctl dismiss
+  bind = $mainMod SHIFT, N, exec, makoctl dismiss --all
+  ```
+</Tip>
+
+## Do Not Disturb mode
+
+Create a DND mode configuration:
+
+```conf ~/.config/mako/config
+[mode=dnd]
+invisible=1
+```
+
+Activate/deactivate:
+
+```bash
+makoctl mode -s dnd    # Enable DND
+makoctl mode -s default # Disable DND
+```
+
+## Testing notifications
+
+Send test notifications to verify your configuration:
+
+```bash
+# Basic notification
+notify-send "Test" "This is a test notification"
+
+# With urgency level
+notify-send -u critical "Important" "This is critical!"
+
+# With icon
+notify-send -i firefox "Firefox" "Download complete"
+
+# With timeout
+notify-send -t 10000 "Long" "This shows for 10 seconds"
+
+# With action buttons
+notify-send -A "yes=Yes" -A "no=No" "Question" "Do you agree?"
+```
+
+## Common use cases
+
+<CardGroup cols={2}>
+  <Card title="Battery warnings" icon="battery-half">
+    Notifications for low battery levels
+  </Card>
+  <Card title="Volume changes" icon="volume-high">
+    Visual feedback for volume adjustments
+  </Card>
+  <Card title="Media playback" icon="music">
+    Now playing information from media players
+  </Card>
+  <Card title="System updates" icon="download">
+    Package manager update notifications
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Notifications not appearing">
+    Check if Mako is running:
+    ```bash
+    pgrep -a mako
+    ```
+    
+    If not running, start it:
+    ```bash
+    mako &
+    ```
+  </Accordion>
+  
+  <Accordion title="Configuration not applied">
+    Reload the configuration:
+    ```bash
+    makoctl reload
+    ```
+    
+    Or restart Mako:
+    ```bash
+    killall mako && mako &
+    ```
+  </Accordion>
+  
+  <Accordion title="Icons not displaying">
+    Install an icon theme:
+    ```bash
+    sudo pacman -S papirus-icon-theme
+    ```
+    
+    Set icon path in config:
+    ```conf
+    icon-path=/usr/share/icons/Papirus-Dark
+    ```
+  </Accordion>
+  
+  <Accordion title="Notifications overlap with Waybar">
+    Adjust the margin to avoid overlapping:
+    ```conf
+    anchor=top-right
+    margin=50,10,10,0  # top,right,bottom,left
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Integration with other tools
+
+### Waybar integration
+
+Add a notification indicator to Waybar:
+
+```json
+"custom/notifications": {
+  "format": "{icon} {}",
+  "format-icons": {
+    "notification": "<span foreground='red'><sup></sup></span>",
+    "none": "",
+    "dnd-notification": "<span foreground='red'><sup></sup></span>",
+    "dnd-none": ""
+  },
+  "return-type": "json",
+  "exec": "makoctl list",
+  "on-click": "makoctl dismiss",
+  "on-click-right": "makoctl dismiss --all",
+  "escape": true
+}
+```
+
+## Performance considerations
+
+- Keep `max-visible` reasonable (3-5) to avoid cluttering the screen
+- Use `default-timeout` to automatically dismiss notifications
+- Group notifications by app to reduce visual clutter
+- Disable icons for minimal resource usage
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Hyprland" icon="desktop" href="/desktop/hyprland">
+    Mako autostart configuration
+  </Card>
+  <Card title="Waybar" icon="chart-bar" href="/desktop/waybar">
+    Integrate notification indicators
+  </Card>
+</CardGroup>
+
+## Resources
+
+- [Mako Man Page](https://man.archlinux.org/man/mako.1)
+- [Mako GitHub](https://github.com/emersion/mako)
+- [Makoctl Man Page](https://man.archlinux.org/man/makoctl.1)
